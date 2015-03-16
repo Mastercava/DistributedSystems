@@ -2,6 +2,11 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 
 
 public class Server {
@@ -9,6 +14,27 @@ public class Server {
 	final static String INET_ADDR = "228.5.6.7";
 	final static int PORT = 6789;
 	final static int BUFFER_SIZE = 256;
+	
+	private HashMap<String, SecretKey> table;
+	private SecretKey dek;
+	
+	public Server() {
+		
+		table = new HashMap<String, SecretKey>();
+		KeyGenerator keygen = null;
+		
+		try {
+			keygen = KeyGenerator.getInstance("DES");
+			keygen.init(56);
+			
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		
+		dek = keygen.generateKey();
+		
+	}
+	
 	
 	public static void main(String[] args) {
 		
