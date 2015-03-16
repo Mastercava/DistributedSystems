@@ -65,7 +65,6 @@ public class Client {
 		try {
 
 
-			group = InetAddress.getByName(INET_ADDR);
 
 			
 			group = InetAddress.getByName(GROUP_ADDR);
@@ -78,7 +77,6 @@ public class Client {
 		}
 
 
-		System.out.println("Client connected succesfully to group " + INET_ADDR);
 
 
 		
@@ -156,35 +154,9 @@ public class Client {
 			}
 
 		}
+	}	
 
 	
-	    public void run() {
-	
-	    	Scanner reader = new Scanner(System.in);
-	    	System.out.println("Write a message to send to the group and press enter");
-	    	
-	    	while(!terminateFlag) {
-	    		String msg = reader.next();
-	    		
-	    		//System.out.println(msg);
-	    		
-	    		if(msg.equals("exit")) {
-	    			terminateFlag = true;
-	    			System.out.println("Closing client process");
-	    		}
-	    		else {
-	    			DatagramPacket packet = new DatagramPacket(msg.getBytes(), msg.length(), group, PORT);
-		    		try {
-						socket.send(packet);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-	    		}
-	    		
-	    	}
-	
-	    }
-
-	}
+	  
 
 }
