@@ -2,14 +2,12 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.util.HashMap;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-
-import java.net.UnknownHostException;
 
 
 
@@ -21,12 +19,18 @@ public class Server {
 	final static int BUFFER_SIZE = 256;
 	
 	private HashMap<String, SecretKey> table;
+	private SecretKey[][] hashTable;
 	private SecretKey dek;
+	
+	private static InetAddress group;
+	private static MulticastSocket socket;
 	
 	public Server() {
 		
 		table = new HashMap<String, SecretKey>();
 		KeyGenerator keygen = null;
+		
+		hashTable = new SecretKey[2][5];
 		
 		try {
 			keygen = KeyGenerator.getInstance("DES");
@@ -38,13 +42,6 @@ public class Server {
 		
 		dek = keygen.generateKey();
 		
-	}
-	
-	
-	public static void main(String[] args) {
-		
-		InetAddress group;
-		MulticastSocket socket;
 		
 		try {
 			
@@ -63,7 +60,53 @@ public class Server {
 			System.out.println("Server locally connected to group " + GROUP_ADDR);
 		}
 		
+		generateKeys();
+	}
+	
+	private void generateKeys() {
+		SecretKey key;
+		KeyGenerator keygen = null;
+		String index;
+		try {
+			keygen = KeyGenerator.getInstance("DES");
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		
+		/*for (int i=0; i<2;i++) {
+			for (int j=0; j<3;j++) {
+				key = keygen.generateKey();
+				index = "" + i + "" + j;
+				table.put(index, key);
+				
+			}
+		}*/
+		
+		for (int i = 0; i<2;i++) {
+			for (int j=0; j<5; j++) {
+				hashTable[i][j] = keygen.generateKey();
+				
+			}
+		}
+		
+		
+	}
+	
+	public void initialCommunication(int id, PublicKey key) {
+		
+		
+		
+	}
+	
+	
+	public static void main(String[] args) {
+		
+		
+
+		
 		byte[] buf = new byte[BUFFER_SIZE];
+		
+		Server server = new Server();
 		
 		while (true) {
 			

@@ -32,6 +32,8 @@ public class Client {
 	private PublicKey publKey;
 	private PrivateKey privKey;
 	
+	private int id;
+	
 	private boolean terminateFlag = false;
 	
 	public static void main(String[] args) {
@@ -46,7 +48,7 @@ public class Client {
 
 		KeyPairGenerator keygen;
 		SecureRandom random;
-
+		//generation of asymmetric key pairs
 		try {
 			keygen = KeyPairGenerator.getInstance("DSA","SUN");
 			random = SecureRandom.getInstance("SHA1PRNG", "SUN");
@@ -63,9 +65,6 @@ public class Client {
 		}
 		System.out.println("Key Pairs Generated");
 		try {
-
-
-
 			
 			group = InetAddress.getByName(GROUP_ADDR);
 
@@ -95,8 +94,15 @@ public class Client {
 
 	}
 	
+	/*
+	 * Getter public key
+	 */
 	public Key getPublicKey() {
 		return publKey;
+	}
+	
+	private void connect() {
+		
 	}
 
 	class ReceiveThread extends Thread {
