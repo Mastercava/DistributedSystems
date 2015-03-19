@@ -13,6 +13,9 @@ import javax.crypto.SecretKey;
 
 public class Server {
 
+	final static int BIT_NUMBER = 2;
+	final static int SUPPORTED_CLIENTS_BITS = 3; 
+
 	final static String OWN_ADDR = "192.168.1.1";
 	final static String GROUP_ADDR = "228.5.6.7";
 	final static int PORT = 6789;
@@ -30,7 +33,7 @@ public class Server {
 		table = new HashMap<String, SecretKey>();
 		KeyGenerator keygen = null;
 		
-		hashTable = new SecretKey[2][5];
+		hashTable = new SecretKey[BIT_NUMBER][SUPPORTED_CLIENTS_BITS];
 		
 		try {
 			keygen = KeyGenerator.getInstance("DES");
@@ -73,14 +76,14 @@ public class Server {
 			e.printStackTrace();
 		}
 		
-		/*for (int i=0; i<2;i++) {
+		for (int i=0; i<2;i++) {
 			for (int j=0; j<3;j++) {
 				key = keygen.generateKey();
 				index = "" + i + "" + j;
 				table.put(index, key);
 				
 			}
-		}*/
+		}
 		
 		for (int i = 0; i<2;i++) {
 			for (int j=0; j<5; j++) {
