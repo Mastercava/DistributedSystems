@@ -76,7 +76,7 @@ public class Server {
 			e.printStackTrace();
 		}
 		
-		for (int i=0; i<2;i++) {
+		/*for (int i=0; i<2;i++) {
 			for (int j=0; j<3;j++) {
 				key = keygen.generateKey();
 				index = "" + i + "" + j;
@@ -84,6 +84,7 @@ public class Server {
 				
 			}
 		}
+		*/
 		
 		for (int i = 0; i<2;i++) {
 			for (int j=0; j<5; j++) {
@@ -95,9 +96,26 @@ public class Server {
 		
 	}
 	
-	public void initialCommunication(int id, PublicKey key) {
+	public void joinGroup(int id, PublicKey key) {
+		int[] values = new int[SUPPORTED_CLIENTS_BITS];
+		//inizializza il vettore per vedere quali chiavi cambiare
+		for (int i = 0; i < SUPPORTED_CLIENTS_BITS; i++)
+			values[i] = 0;
+		while (id > 0) {
+			int i = 0;
+			if (id % 2)
+				values[i] = 1;
+			else 
+				values[i] = 0;
+		}
+		
+		ArrayUtils.reverse(values);
 		
 		
+		
+	}
+	
+	private byte[] encryptSym(byte[] plain) {
 		
 	}
 	
