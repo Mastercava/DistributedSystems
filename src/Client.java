@@ -1,20 +1,19 @@
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-
+import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-
-import java.net.UnknownHostException;
-
+import java.util.Base64;
 import java.util.Scanner;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 
 
 public class Client {
@@ -24,6 +23,8 @@ public class Client {
 	private PrivateKey privKey;
 	
 	private Messaging multicast;
+	
+	private byte[] messageReceived;
 	
 	private int clientId;
 	
@@ -39,6 +40,8 @@ public class Client {
 		//Creates a client instance
 		Client client = new Client(assignedId);
 		
+		
+		
 	}
 	
 	
@@ -50,16 +53,12 @@ public class Client {
 		SecureRandom random;
 		//generation of asymmetric key pairs
 		try {
-			keygen = KeyPairGenerator.getInstance("DSA","SUN");
-			random = SecureRandom.getInstance("SHA1PRNG", "SUN");
-			keygen.initialize(1024,random);
+			keygen = KeyPairGenerator.getInstance("RSA");
+			keygen.initialize(2048);
 			keypair = keygen.generateKeyPair();
 			privKey = keypair.getPrivate();
 			publKey = keypair.getPublic();
 		} catch (NoSuchAlgorithmException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (NoSuchProviderException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
@@ -73,6 +72,31 @@ public class Client {
 
 		SendThread snd = new SendThread();
 		snd.start();
+		
+		Server server = new Server();
+		server.addClient(clientId, publKey);
+		
+		messageReceived = server.getEncrMessage();
+		try {
+			decryptMessageAsymmetric(messageReceived);
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalBlockSizeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (BadPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 
 	}
 	
@@ -81,6 +105,20 @@ public class Client {
 	 */
 	public Key getPublicKey() {
 		return publKey;
+	}
+	
+	private void decryptMessageAsymmetric(byte[] message) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+		byte[] msg;
+		Cipher cipher = Cipher.getInstance("RSA");
+		cipher.init(Cipher.DECRYPT_MODE, privKey);
+		
+		msg = cipher.doFinal(message);
+		System.out.println("PLAIN MSG " + ByteToString(message));
+		
+	}
+	
+	private String ByteToString(byte[] arg) {
+		return Base64.getEncoder().encodeToString(arg);
 	}
 
 	

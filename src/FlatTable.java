@@ -1,5 +1,6 @@
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.HashMap;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -19,7 +20,6 @@ public class FlatTable {
 		
 		bitsNeeded = (int) (Math.log(SUPPORTED_HOSTS) / Math.log(2));
 		flatTable = new SecretKey[2][bitsNeeded];
-		
 		System.out.println("Flat table with " + bitsNeeded + " bits created, supporting " + SUPPORTED_HOSTS + " hosts");
 		try {
 			keygen = KeyGenerator.getInstance(ENCRYPTION_ALGORITHM);
@@ -48,7 +48,39 @@ public class FlatTable {
 		
 	}
 	
-	public void joinGroup(int clientId) {
+	public HashMap<Integer[], SecretKey> joinGroup(int clientId) {
+		boolean[] binValues = idToBitArray(clientId);
+		Integer[] keyId = new Integer[2]; 
+		HashMap<Integer[],SecretKey> keyGenerated;
+		keyGenerated = new HashMap<Integer[],SecretKey>();
+		for (int i = 0; i < bitsNeeded; i++) {
+			if (!binValues[i]) {
+				flatTable[0][i] = keygen.generateKey();
+				keyId[0] = i;
+				keyId[1] = 0;
+				keyGenerated.put(keyId, flatTable[0][i]);
+				System.out.println("Key " + 0 + "," + i +" updated!");
+
+			} else {
+				flatTable[0][i] = keygen.generateKey();
+				keyId[0] = i;
+				keyId[1] = 1;
+				keyGenerated.put(keyId, flatTable[1][i]);
+				System.out.println("Key " + 1 + "," + i +" updated!");
+				
+			}
+		}	
+			//updates dek
+		dek = keygen.generateKey();
+		//for the dek used values of keyId -1 ,-1
+		keyId[0] = -1;
+		keyId[1] = -1;
+		keyGenerated.put(keyId, dek);
+		return keyGenerated;
+			
+		
+		
+		
 		
 	}
 	
