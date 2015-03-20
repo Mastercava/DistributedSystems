@@ -33,7 +33,7 @@ public class Messaging {
 		}
 		
 		try {
-			System.out.println("Client " + InetAddress.getLocalHost().getHostAddress() + " connected succesfully to group " + GROUP_ADDR);
+			System.out.println("Host " + InetAddress.getLocalHost().getHostAddress() + " connected succesfully to group " + GROUP_ADDR);
 		} catch (Exception e) {
 			System.out.println("Client connected locally to group " + GROUP_ADDR);
 		}

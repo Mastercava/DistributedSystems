@@ -82,11 +82,8 @@ public class Client {
 	public Key getPublicKey() {
 		return publKey;
 	}
-	
-	private void connect() {
-		
-	}
 
+	
 	class ReceiveThread extends Thread {
 
 		public void run() {
@@ -108,6 +105,7 @@ public class Client {
 		}
 	}
 
+	
 	class SendThread extends Thread {
 
 		public void run() {
