@@ -74,7 +74,7 @@ public class Client {
 		snd.start();
 		
 		Server server = new Server();
-		server.addClient(clientId, publKey);
+		server.join(clientId, publKey);
 		
 		messageReceived = server.getEncrMessage();
 		try {

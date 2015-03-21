@@ -64,7 +64,7 @@ public class Server {
 		
 	}
 	
-	public void addClient(int clientId, Key key) {
+	public void join(int clientId, Key key) {
 		Messaging msg = new Messaging(serverId);
 		String str = " ";
 		if (!clientsConnected.isEmpty()) {
@@ -84,30 +84,31 @@ public class Server {
 		//add method to send valures to hashmap
 		byte[] encryptedMsg = null;
 
-		try {
-			//encryptedMsg = asymmetricEncrypt(newKeys.toString().getBytes(), key);
-			encrMessage = asymmetricEncrypt(Base64.getEncoder().encode(encryptedMsg), key);
-		} catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+		
+		Key newDek = flatTable.changeDek();
+		newDek = flatTable.changeDek();
+		
+		initialSendDek(key, Utilities.keyToString(newDek).getBytes());
 		
 		
 		
 		
 		
 		
-		
-		
-		
-		
+		//add the client to the list of clients connected
 		clientsConnected.add(clientId);
+	}
+	
+	public void leave(int clientId) {
+		
+		HashMap<Integer[], SecretKey> newKeys;
+		newKeys = flatTable.leaveGroup(clientId);
+		
+		
+		
+		clientsConnected.remove(clientId);
+		
 	}
 
 	private byte[] asymmetricEncrypt(byte[] arg, Key key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
@@ -130,5 +131,31 @@ public class Server {
 		
 		
 		return toReturn;
+	}
+	
+	private void initialSendDek(Key key, byte[] message) {
+		
+		try {
+			//encryptedMsg = asymmetricEncrypt(newKeys.toString().getBytes(), key);
+			encrMessage = asymmetricEncrypt(Base64.getEncoder().encode(message), key);
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		Messaging msg = new Messaging(serverId);
+		
+		//marco controlla qua la send se i parametri sono ok
+		msg.sendMessage(1, encrMessage);
+		
+		
+		
+		
 	}
 }

@@ -1,3 +1,4 @@
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.HashMap;
@@ -29,7 +30,7 @@ public class FlatTable {
 		
 		System.out.println("Using encryption algorithm \"" + ENCRYPTION_ALGORITHM + "\"");
 		dek = generateKey();
-		System.out.println("DEK generated: " + keyToString(dek));
+		System.out.println("DEK generated: " + Utilities.keyToString(dek));
 		
 		initializeTable();
 		
@@ -41,7 +42,7 @@ public class FlatTable {
 		for (i = 0; i<2; i++) {
 			for (j=0; j<bitsNeeded; j++) {
 				flatTable[i][j] = generateKey();
-				System.out.print(keyToString(flatTable[i][j]) + "   ");
+				System.out.print(Utilities.keyToString(flatTable[i][j]) + "   ");
 			}
 			System.out.println("");
 		}
@@ -49,27 +50,28 @@ public class FlatTable {
 	}
 	
 	public HashMap<Integer[], SecretKey> joinGroup(int clientId) {
-		boolean[] binValues = idToBitArray(clientId);
+		boolean[] binValues = Utilities.idToBitArray(clientId);
 		HashMap<Integer[],SecretKey> keys;
 		Integer[] keyId = new Integer[2];
 		
 		keys = changeKeys(binValues);
 			//updates dek
-		dek = keygen.generateKey();
-		//for the dek used values of keyId -1 ,-1
-		keyId[0] = -1;
-		keyId[1] = -1;
-		keys.put(keyId, dek);
-		return keys;
+		
 			
 		
-		
+		return keys;
 		
 		
 	}
 	
+	public Key changeDek() {
+		dek = keygen.generateKey();
+		//for the dek used values of keyId -1 ,-1
+		return dek;
+	}
+	
 	public HashMap<Integer[], SecretKey> leaveGroup(int clientId) {
-		boolean[] binValues = idToBitArray(clientId);
+		boolean[] binValues = Utilities.idToBitArray(clientId);
 		
 		HashMap<Integer[], SecretKey> keys;
 		keys = changeKeys(binValues);
@@ -106,23 +108,15 @@ public class FlatTable {
 		
 	}
 	
+	
+	
 	private SecretKey generateKey() {
 		SecretKey key = keygen.generateKey();
 		return key;
 	}
 	
-	private String keyToString(SecretKey key) {
-		return Base64.getEncoder().encodeToString(key.getEncoded());
-	}
 	
-	private boolean[] idToBitArray(int clientId) {
-		
-		boolean[] bits = new boolean[7];
-	    for (int i = 6; i >= 0; i--) {
-	        bits[i] = (clientId & (1 << i)) != 0;
-	    }
-	    return bits;
-	    
-	}
+	
+	
 
 }
