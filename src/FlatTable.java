@@ -50,11 +50,41 @@ public class FlatTable {
 	
 	public HashMap<Integer[], SecretKey> joinGroup(int clientId) {
 		boolean[] binValues = idToBitArray(clientId);
+		HashMap<Integer[],SecretKey> keys;
+		Integer[] keyId = new Integer[2];
+		
+		keys = changeKeys(binValues);
+			//updates dek
+		dek = keygen.generateKey();
+		//for the dek used values of keyId -1 ,-1
+		keyId[0] = -1;
+		keyId[1] = -1;
+		keys.put(keyId, dek);
+		return keys;
+			
+		
+		
+		
+		
+	}
+	
+	public HashMap<Integer[], SecretKey> leaveGroup(int clientId) {
+		boolean[] binValues = idToBitArray(clientId);
+		
+		HashMap<Integer[], SecretKey> keys;
+		keys = changeKeys(binValues);
+		
+		
+		
+		return keys;
+	}
+	
+	private HashMap<Integer[], SecretKey> changeKeys(boolean[] value) {
 		Integer[] keyId = new Integer[2]; 
 		HashMap<Integer[],SecretKey> keyGenerated;
 		keyGenerated = new HashMap<Integer[],SecretKey>();
 		for (int i = 0; i < bitsNeeded; i++) {
-			if (!binValues[i]) {
+			if (!value[i]) {
 				flatTable[0][i] = keygen.generateKey();
 				keyId[0] = i;
 				keyId[1] = 0;
@@ -69,22 +99,10 @@ public class FlatTable {
 				System.out.println("Key " + 1 + "," + i +" updated!");
 				
 			}
-		}	
-			//updates dek
-		dek = keygen.generateKey();
-		//for the dek used values of keyId -1 ,-1
-		keyId[0] = -1;
-		keyId[1] = -1;
-		keyGenerated.put(keyId, dek);
+		}
+		
 		return keyGenerated;
-			
 		
-		
-		
-		
-	}
-	
-	public void leaveGroup(int clientId) {
 		
 	}
 	
