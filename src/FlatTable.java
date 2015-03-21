@@ -59,14 +59,14 @@ public class FlatTable {
 				keyId[0] = i;
 				keyId[1] = 0;
 				keyGenerated.put(keyId, flatTable[0][i]);
-				System.out.println("Key " + 0 + "," + i +" updated!");
+				System.out.println("Key " + i + "," + 1 +" updated!");
 
 			} else {
 				flatTable[0][i] = keygen.generateKey();
 				keyId[0] = i;
 				keyId[1] = 1;
 				keyGenerated.put(keyId, flatTable[1][i]);
-				System.out.println("Key " + 1 + "," + i +" updated!");
+				System.out.println("Key " + i + "," + 1 +" updated!");
 				
 			}
 		}	

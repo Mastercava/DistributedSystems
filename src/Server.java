@@ -3,6 +3,7 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 
 import javax.crypto.BadPaddingException;
@@ -82,10 +83,10 @@ public class Server {
 		newKeys = flatTable.joinGroup(clientId);
 		
 		//add method to send valures to hashmap
-		byte[] encryptedMsg;
+		byte[] encryptedMsg = null;
 		try {
 			//encryptedMsg = asymmetricEncrypt(newKeys.toString().getBytes(), key);
-			encrMessage = asymmetricEncrypt(newKeys.toString().getBytes(), key);
+			encrMessage = asymmetricEncrypt(Base64.getEncoder().encode(encryptedMsg), key);
 		} catch (InvalidKeyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -123,8 +124,8 @@ public class Server {
 			e.printStackTrace();
 		}
 		
-		System.out.println("Plain Message" + arg.toString());
-		System.out.println("Encrypted message " + toReturn.toString());
+		System.out.println("Plain Message " + Base64.getEncoder().encodeToString(arg));
+		System.out.println("Encrypted message " + Base64.getEncoder().encodeToString(toReturn));
 		
 		
 		

@@ -113,7 +113,8 @@ public class Client {
 		cipher.init(Cipher.DECRYPT_MODE, privKey);
 		
 		msg = cipher.doFinal(message);
-		System.out.println("PLAIN MSG " + ByteToString(message));
+		
+		System.out.println("PLAIN MSG " + ByteToString(msg));
 		
 	}
 	
