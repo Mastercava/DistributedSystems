@@ -1,11 +1,9 @@
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -82,8 +80,10 @@ public class Server {
 		HashMap<Integer[], SecretKey> newKeys;
 		newKeys = flatTable.joinGroup(clientId);
 		
+
 		//add method to send valures to hashmap
 		byte[] encryptedMsg = null;
+
 		try {
 			//encryptedMsg = asymmetricEncrypt(newKeys.toString().getBytes(), key);
 			encrMessage = asymmetricEncrypt(Base64.getEncoder().encode(encryptedMsg), key);
