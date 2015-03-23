@@ -128,34 +128,13 @@ public class Server {
 		
 	}
 
-	private byte[] asymmetricEncrypt(byte[] arg, Key key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
-		
-		Cipher cipher = Cipher.getInstance("RSA");
-		byte[] toReturn = null;
-		cipher.init(Cipher.ENCRYPT_MODE, key);
-		try {
-			toReturn = cipher.doFinal(arg);
-		} catch (IllegalBlockSizeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (BadPaddingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		System.out.println("Plain Message " + Base64.getEncoder().encodeToString(arg));
-		System.out.println("Encrypted message " + Base64.getEncoder().encodeToString(toReturn));
-		
-		
-		
-		return toReturn;
-	}
 	
+	/*
 	private void initialSendDek(Key key, byte[] message) {
 		
 		try {
 			//encryptedMsg = asymmetricEncrypt(newKeys.toString().getBytes(), key);
-			encrMessage = asymmetricEncrypt(Base64.getEncoder().encode(message), key);
+			encrMessage = encryptAsymmetric(Base64.getEncoder().encode(message), key);
 		} catch (InvalidKeyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -171,9 +150,8 @@ public class Server {
 		
 		//marco controlla qua la send se i parametri sono ok
 		msg.sendMessage(1, encrMessage, null);
-		
-		
 	}
+	*/
 	
 	private void printConnectedClients() {
 		String msg;

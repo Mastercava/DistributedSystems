@@ -55,31 +55,8 @@ public class Client {
 		recv.start();
 
 		SendThread snd = new SendThread();
-		snd.start();
-		
-		/*
-		
-		messageReceived = server.getEncrMessage();
-		try {
-			decryptMessageAsymmetric(messageReceived);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		*/
-		
+		snd.start();		
 
-	}
-	
-	
-	private void decryptMessageAsymmetric(byte[] message) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-		byte[] msg;
-		Cipher cipher = Cipher.getInstance("RSA");
-		cipher.init(Cipher.DECRYPT_MODE, keypair.getPrivate());
-		
-		msg = cipher.doFinal(message);
-		
-		System.out.println("PLAIN MSG " + byteToString(msg));
-		
 	}
 	
 	
