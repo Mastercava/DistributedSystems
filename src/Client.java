@@ -65,7 +65,7 @@ public class Client {
 		//Generation of asymmetric key pairs
 		try {
 			keygen = KeyPairGenerator.getInstance("RSA");
-			keygen.initialize(2048);
+			keygen.initialize(512);
 			keypair = keygen.generateKeyPair();
 			
 		} catch (Exception e) {
@@ -96,7 +96,12 @@ public class Client {
 				//Valid and clear/decryptable message 
 				if(incomingPacket.isValid()) {
 					if(incomingPacket.getType() == 0) {
-						System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
+						if (incomingPacket.getSenderId() == 0) {
+							System.out.println("Server ##" + ": " + incomingPacket.getMessage());
+						} else {
+							System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
+						}
+						
 					}
 					else {
 						//TODO
@@ -128,8 +133,9 @@ public class Client {
 	    			System.out.println("Closing client process");
 	    		}
 	    		else if(msg.equals("JOIN")) {
-	    			multicast.sendMessage(1, msg.getBytes(), null);
 	    			System.out.println("Trying to join the group...");
+	    			String encodedKey = keypair.getPublic().toString();
+	    			multicast.sendMessage(1, encodedKey.getBytes(), null);
 	    		}
 	    		else if(msg.equals("LEAVE")) {
 	    			multicast.sendMessage(2, msg.getBytes(), null);

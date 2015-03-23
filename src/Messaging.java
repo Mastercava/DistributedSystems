@@ -5,12 +5,19 @@ import java.net.MulticastSocket;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+<<<<<<< HEAD
 import java.util.Base64;
+=======
+>>>>>>> origin/master
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+<<<<<<< HEAD
+=======
+import javax.crypto.SecretKey;
+>>>>>>> origin/master
 
 
 public class Messaging {
@@ -89,10 +96,13 @@ public class Messaging {
 			e.printStackTrace();
 			return null;
 		}
+		
+		
 			
 
 	}
 	
+<<<<<<< HEAD
 	
 	
 	private byte[] encryptAsymmetric(byte[] data, Key key) {
@@ -127,6 +137,50 @@ public class Messaging {
 		}
 		
 		return data;
+=======
+	public boolean sendInitialMessage(int type, byte[] data, SecretKey publicKey) {
+		byte[] encryptedMessage = null;
+		
+		System.out.println("########  " + publicKey.getAlgorithm());
+		
+		try {
+			
+			Cipher cipher = Cipher.getInstance("RSA");
+			cipher.init(Cipher.ENCRYPT_MODE,publicKey);
+			encryptedMessage = cipher.doFinal(data);
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalBlockSizeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (BadPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println("Encryption with RSA done");
+		byte[] newData = new byte[data.length+3];
+		newData[0] = (byte) senderId;
+		newData[1] = (byte) type;
+		newData[2] = Settings.CHECK_CODE;
+		
+		System.arraycopy(data, 0, newData, 3, data.length);
+		
+		
+		
+		
+		
+		
+		
+		return true;
+>>>>>>> origin/master
 	}
 	
 }

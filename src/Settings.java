@@ -22,4 +22,14 @@ public class Settings {
 		SERVER_PUBLIC_KEY = key;
 	}
 	
+	public static boolean asymmetric() {
+		return false;
+	}
+	
+	public static boolean symmetric() {
+		return true;
+	}
+	
+	
+	
 }
