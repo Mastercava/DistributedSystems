@@ -5,19 +5,14 @@ import java.net.MulticastSocket;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-<<<<<<< HEAD
 import java.util.Base64;
-=======
->>>>>>> origin/master
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-<<<<<<< HEAD
-=======
+
 import javax.crypto.SecretKey;
->>>>>>> origin/master
 
 
 public class Messaging {
@@ -102,10 +97,9 @@ public class Messaging {
 
 	}
 	
-<<<<<<< HEAD
 	
 	
-	private byte[] encryptAsymmetric(byte[] data, Key key) {
+	public byte[] encryptAsymmetric(byte[] data, Key key) {
 		
 		byte[] encryptedData = null;
 		
@@ -123,7 +117,7 @@ public class Messaging {
 	}
 	
 
-	private byte[] decryptAsymmetric(byte[] encryptedData, Key key) {
+	public byte[] decryptAsymmetric(byte[] encryptedData, Key key) {
 		
 		byte[] data = null;
 		
@@ -137,7 +131,8 @@ public class Messaging {
 		}
 		
 		return data;
-=======
+	}
+	
 	public boolean sendInitialMessage(int type, byte[] data, SecretKey publicKey) {
 		byte[] encryptedMessage = null;
 		
@@ -190,7 +185,6 @@ public class Messaging {
 		
 		
 		return true;
->>>>>>> origin/master
 	}
 	
 }

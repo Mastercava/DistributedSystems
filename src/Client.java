@@ -14,6 +14,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 
 public class Client {
@@ -27,6 +28,8 @@ public class Client {
 	private int clientId;
 	
 	private boolean terminateFlag = false;
+	
+	private SecretKey dek;
 	
 	public static void main(String[] args) {
 		
@@ -55,8 +58,31 @@ public class Client {
 		recv.start();
 
 		SendThread snd = new SendThread();
-		snd.start();		
+		snd.start();
+		
+		/*
+		
+		messageReceived = server.getEncrMessage();
+		try {
+			decryptMessageAsymmetric(messageReceived);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		*/
+		
 
+	}
+	
+	
+	private void decryptMessageAsymmetric(byte[] message) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+		byte[] msg;
+		Cipher cipher = Cipher.getInstance("RSA");
+		cipher.init(Cipher.DECRYPT_MODE, keypair.getPrivate());
+		
+		msg = cipher.doFinal(message);
+		
+		System.out.println("PLAIN MSG " + byteToString(msg));
+		
 	}
 	
 	
@@ -102,9 +128,17 @@ public class Client {
 							System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
 						}
 						
+						
 					}
 					else {
-						//TODO
+						if (incomingPacket.getSenderId() == 0) {
+							byte[] dekIncomed;
+							byte[] dekEncrypted;
+							System.out.println("Something Received from server");
+							dekIncomed = incomingPacket.getMessage().getBytes();
+							dekEncrypted = multicast.decryptAsymmetric(dekIncomed, keypair.getPrivate());
+							dek = new SecretKeySpec(dekIncomed, "AES");
+						}
 					}
 				}
 				//Cannot decrypt
@@ -134,7 +168,8 @@ public class Client {
 	    		}
 	    		else if(msg.equals("JOIN")) {
 	    			System.out.println("Trying to join the group...");
-	    			multicast.sendMessage(1, keypair.getPublic().getEncoded(), null);
+	    			multicast.sendMessage(1, Base64.getEncoder().encode(keypair.getPublic().getEncoded()), null);
+	    			System.out.println("###########  "+Base64.getEncoder().encode(keypair.getPublic().getEncoded()));
 	    		}
 	    		else if(msg.equals("LEAVE")) {
 	    			multicast.sendMessage(2, msg.getBytes(), null);

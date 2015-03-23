@@ -67,6 +67,8 @@ public class Server {
 					//Client tries to join the group
 					if(incomingPacket.getType() == 1) {
 						byte[] encodedKey = incomingPacket.getMessage().getBytes();
+						System.out.println("#########    "+encodedKey);
+						encodedKey = Base64.getDecoder().decode(encodedKey);
 						System.out.println("key received");
 						SecretKey originalKey = new SecretKeySpec(encodedKey, 0, encodedKey.length, "RSA");
 						join(incomingPacket.getSenderId(), originalKey);
@@ -117,7 +119,7 @@ public class Server {
 			
 			String s = "Client #" + clientId + " joined the group";
 			System.out.println(s);
-			multicast.sendInitialMessage(0, flatTable.changeDek().getEncoded(), key);
+			multicast.sendInitialMessage(1, flatTable.changeDek().getEncoded(), key);
 			
 			printConnectedClients();
 			
@@ -172,9 +174,9 @@ public class Server {
 =======
 		*/
 		
->>>>>>> origin/master
-	}
-	*/
+
+	
+	
 	
 	private void printConnectedClients() {
 		String msg;
