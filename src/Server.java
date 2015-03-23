@@ -1,5 +1,7 @@
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -19,6 +21,7 @@ public class Server {
 	private Messaging multicast;
 	private FlatTable flatTable;
 	private ArrayList<Integer> clientsConnected;
+	private KeyPair keypair;
 	
 	private byte[] encrMessage; //for test
 	
@@ -31,6 +34,8 @@ public class Server {
 		
 		multicast = new Messaging(serverId);
 		multicast.initialize();
+		
+		generateKeys();
 		
 		flatTable = new FlatTable();
 		clientsConnected = new ArrayList<Integer>();
@@ -163,4 +168,23 @@ public class Server {
 		System.out.println(msg);
 	
 	}
+	
+	private boolean generateKeys() {
+		KeyPairGenerator keygen;
+		//Generation of asymmetric key pairs
+		try {
+			keygen = KeyPairGenerator.getInstance("RSA");
+			keygen.initialize(2048);
+			keypair = keygen.generateKeyPair();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Failed to generate keys!!");
+			return false;
+		}
+		System.out.println("Keypair generated succesfully");
+		Settings.setServerPublicKey(keypair.getPublic());
+		return true;
+	}
+	
 }
