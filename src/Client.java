@@ -19,8 +19,6 @@ import javax.crypto.SecretKey;
 public class Client {
 	
 	private KeyPair keypair;
-	private PublicKey publKey;
-	private PrivateKey privKey;
 	
 	private Messaging multicast;
 	
@@ -41,28 +39,14 @@ public class Client {
 		Client client = new Client(assignedId);
 		
 		
-		
 	}
 	
 	
 	public Client(int assignedId) {
-		
+
 		clientId = assignedId;
 
-		KeyPairGenerator keygen;
-		SecureRandom random;
-		//generation of asymmetric key pairs
-		try {
-			keygen = KeyPairGenerator.getInstance("RSA");
-			keygen.initialize(2048);
-			keypair = keygen.generateKeyPair();
-			privKey = keypair.getPrivate();
-			publKey = keypair.getPublic();
-		} catch (NoSuchAlgorithmException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		System.out.println("Key Pairs Generated");
+		generateKeys();
 		
 		multicast = new Messaging(clientId);
 		multicast.initialize();
@@ -73,52 +57,52 @@ public class Client {
 		SendThread snd = new SendThread();
 		snd.start();
 		
-		Server server = new Server();
-		server.join(clientId, publKey);
+		/*
 		
 		messageReceived = server.getEncrMessage();
 		try {
 			decryptMessageAsymmetric(messageReceived);
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalBlockSizeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (BadPaddingException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+		*/
 		
 
 	}
 	
-	/*
-	 * Getter public key
-	 */
-	public Key getPublicKey() {
-		return publKey;
-	}
 	
 	private void decryptMessageAsymmetric(byte[] message) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 		byte[] msg;
 		Cipher cipher = Cipher.getInstance("RSA");
-		cipher.init(Cipher.DECRYPT_MODE, privKey);
+		cipher.init(Cipher.DECRYPT_MODE, keypair.getPrivate());
 		
 		msg = cipher.doFinal(message);
 		
-		System.out.println("PLAIN MSG " + ByteToString(msg));
+		System.out.println("PLAIN MSG " + byteToString(msg));
 		
 	}
 	
-	private String ByteToString(byte[] arg) {
+	
+	private boolean generateKeys() {
+		KeyPairGenerator keygen;
+		//Generation of asymmetric key pairs
+		try {
+			keygen = KeyPairGenerator.getInstance("RSA");
+			keygen.initialize(2048);
+			keypair = keygen.generateKeyPair();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Failed to generate keys!!");
+			return false;
+		}
+		System.out.println("Generated public key: " + byteToString(keypair.getPrivate().getEncoded()));
+		System.out.println("Generated private key: " + byteToString(keypair.getPublic().getEncoded()));
+		return true;
+	}
+	
+	
+	private String byteToString(byte[] arg) {
 		return Base64.getEncoder().encodeToString(arg);
 	}
 
@@ -132,11 +116,18 @@ public class Client {
 			while(!terminateFlag) {
 				
 				incomingPacket = multicast.receiveMessage();
-				if(incomingPacket.getType() == 0) {
-					System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
+				//Valid and clear/decryptable message 
+				if(incomingPacket.isValid()) {
+					if(incomingPacket.getType() == 0) {
+						System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
+					}
+					else {
+						//TODO
+					}
 				}
+				//Cannot decrypt
 				else {
-					//TODO
+					System.out.println("Unable to decrypt: " + incomingPacket.getMessage());
 				}
 				
 			}
@@ -155,12 +146,20 @@ public class Client {
 			while(!terminateFlag) {
 				String msg = reader.next();
 				
-	    		if(msg.equals("exit")) {
+	    		if(msg.equals("EXIT")) {
 	    			terminateFlag = true;
 	    			System.out.println("Closing client process");
 	    		}
+	    		else if(msg.equals("JOIN")) {
+	    			multicast.sendMessage(1, msg.getBytes(), null);
+	    			System.out.println("Trying to join the group...");
+	    		}
+	    		else if(msg.equals("LEAVE")) {
+	    			multicast.sendMessage(2, msg.getBytes(), null);
+	    			System.out.println("Trying to leave the group...");
+	    		}
 	    		else {
-	    			multicast.sendMessage(0, msg.getBytes());
+	    			multicast.sendMessage(0, msg.getBytes(), null);
 	    		}
 			}
 

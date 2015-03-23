@@ -40,7 +40,6 @@ public class Server {
 	public static void main(String[] args) {
 				
 		Server server = new Server();
-		FlatTable flatTable = new FlatTable();
 		
 		server.startReceiving();
 
@@ -53,65 +52,84 @@ public class Server {
 		while(true) {
 			
 			incomingPacket = multicast.receiveMessage();
-			if(incomingPacket.getType() == 0) {
-				System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
-			}
-			else {
-				//TODO
-			}
-			
+			if(incomingPacket.isValid()) {
+				if(incomingPacket.getType() == 0) {
+					System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
+				}
+				else {
+					//Client tries to join the group
+					if(incomingPacket.getType() == 1) {
+						join(incomingPacket.getSenderId(), null);
+					}
+					else if(incomingPacket.getType() == 2) {
+						leave(incomingPacket.getSenderId());
+					}
+				}
+			}	
 		}
 		
 	}
 	
 	public void join(int clientId, Key key) {
-		Messaging msg = new Messaging(serverId);
-		String str = " ";
-		if (!clientsConnected.isEmpty()) {
-			if (clientsConnected.get(clientId) == null) {
-				str = "Client not connected: Trying a Connection";
-				
-			} else {
-				str = "Client already connected";
+		
+		if(!clientsConnected.contains(clientId)) {
+			/*
+			Messaging msg = new Messaging(serverId);
+			String str = " ";
+			if (!clientsConnected.isEmpty()) {
+				if (clientsConnected.get(clientId) == null) {
+					str = "Client not connected: Trying a Connection";
+					
+				} else {
+					str = "Client already connected";
+				}
 			}
+			
+			msg.sendMessage(0, str.getBytes());
+			HashMap<Integer[], SecretKey> newKeys;
+			newKeys = flatTable.joinGroup(clientId);
+			
+	
+			//add method to send valures to hashmap
+			byte[] encryptedMsg = null;
+	
+			
+			
+			Key newDek = flatTable.changeDek();
+			newDek = flatTable.changeDek();
+			
+			initialSendDek(key, Utilities.keyToString(newDek).getBytes());
+			
+			*/
+		
+			//add the client to the list of clients connected
+			clientsConnected.add(clientId);
+			
+			System.out.println("Client #" + clientId + " joined the group");
+			printConnectedClients();
+			
 		}
 		
-		msg.sendMessage(0, str.getBytes());
-		HashMap<Integer[], SecretKey> newKeys;
-		newKeys = flatTable.joinGroup(clientId);
-		
-
-		//add method to send valures to hashmap
-		byte[] encryptedMsg = null;
-
-		
-		
-		Key newDek = flatTable.changeDek();
-		newDek = flatTable.changeDek();
-		
-		initialSendDek(key, Utilities.keyToString(newDek).getBytes());
-		
-		
-		
-		
-		
-		
-		//add the client to the list of clients connected
-		clientsConnected.add(clientId);
 	}
 	
 	public void leave(int clientId) {
 		
-		HashMap<Integer[], SecretKey> newKeys;
-		newKeys = flatTable.leaveGroup(clientId);
-		
-		
-		
-		clientsConnected.remove(clientId);
+		if(clientsConnected.contains(clientId)) {
+			/*
+			HashMap<Integer[], SecretKey> newKeys;
+			newKeys = flatTable.leaveGroup(clientId);
+			
+			*/
+			
+			clientsConnected.remove(clientsConnected.indexOf(clientId));
+			System.out.println("Client #" + clientId + " left the group");
+			printConnectedClients();
+		}
 		
 	}
 
 	private byte[] asymmetricEncrypt(byte[] arg, Key key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
+		
 		Cipher cipher = Cipher.getInstance("RSA");
 		byte[] toReturn = null;
 		cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -152,10 +170,19 @@ public class Server {
 		Messaging msg = new Messaging(serverId);
 		
 		//marco controlla qua la send se i parametri sono ok
-		msg.sendMessage(1, encrMessage);
+		msg.sendMessage(1, encrMessage, null);
 		
 		
-		
-		
+	}
+	
+	private void printConnectedClients() {
+		String msg;
+		if(clientsConnected.size() == 0) msg = "Currently there are no clients connected";
+		else {
+			msg = "Currently connected clients: ";
+			for(int id : clientsConnected) msg += id + "  ";
+		}
+		System.out.println(msg);
+	
 	}
 }

@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.security.Key;
 
 
 public class Messaging {
@@ -41,12 +42,18 @@ public class Messaging {
 		return true;
 	}
 	
-	public boolean sendMessage(int type, byte[] data) {
+	public boolean sendMessage(int type, byte[] data, Key encryptionKey) {
 		
-		byte[] newData = new byte[data.length+2];
+		byte[] newData = new byte[data.length+3];
 		newData[0] = (byte) senderId;
 		newData[1] = (byte) type;
-		System.arraycopy(data, 0, newData, 2, data.length);
+		newData[2] = Settings.CHECK_CODE;
+		System.arraycopy(data, 0, newData, 3, data.length);
+		
+		//If key provided, encrypt message
+		if(encryptionKey != null) {
+			
+		}
 		
 		DatagramPacket packet = new DatagramPacket(newData, newData.length, group, PORT);
 
