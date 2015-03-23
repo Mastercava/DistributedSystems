@@ -18,4 +18,14 @@ public class Settings {
 		return instance;
 	}
 	
+	public static boolean asymmetric() {
+		return false;
+	}
+	
+	public static boolean symmetric() {
+		return true;
+	}
+	
+	
+	
 }

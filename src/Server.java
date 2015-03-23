@@ -4,17 +4,19 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 
 
 public class Server {
 	
-	private final int serverId = 1; 
+	private final int serverId = 0; 
 	
 	private Messaging multicast;
 	private FlatTable flatTable;
@@ -59,7 +61,10 @@ public class Server {
 				else {
 					//Client tries to join the group
 					if(incomingPacket.getType() == 1) {
-						join(incomingPacket.getSenderId(), null);
+						byte[] encodedKey = incomingPacket.getMessage().getBytes();
+						System.out.println("key received");
+						SecretKey originalKey = new SecretKeySpec(encodedKey, 0, encodedKey.length, "RSA");
+						join(incomingPacket.getSenderId(), originalKey);
 					}
 					else if(incomingPacket.getType() == 2) {
 						leave(incomingPacket.getSenderId());
@@ -70,7 +75,7 @@ public class Server {
 		
 	}
 	
-	public void join(int clientId, Key key) {
+	public void join(int clientId, SecretKey key) {
 		
 		if(!clientsConnected.contains(clientId)) {
 			/*
@@ -105,8 +110,12 @@ public class Server {
 			//add the client to the list of clients connected
 			clientsConnected.add(clientId);
 			
-			System.out.println("Client #" + clientId + " joined the group");
+			String s = "Client #" + clientId + " joined the group";
+			System.out.println(s);
+			multicast.sendInitialMessage(0, s.getBytes(), key);
+			
 			printConnectedClients();
+			
 			
 		}
 		
@@ -122,8 +131,11 @@ public class Server {
 			*/
 			
 			clientsConnected.remove(clientsConnected.indexOf(clientId));
-			System.out.println("Client #" + clientId + " left the group");
+			String s = "Client #" + clientId + " left the group";
+			System.out.println(s);
+			multicast.sendMessage(0, s.getBytes(),null);
 			printConnectedClients();
+			
 		}
 		
 	}
@@ -153,6 +165,7 @@ public class Server {
 	
 	private void initialSendDek(Key key, byte[] message) {
 		
+		/*
 		try {
 			//encryptedMsg = asymmetricEncrypt(newKeys.toString().getBytes(), key);
 			encrMessage = asymmetricEncrypt(Base64.getEncoder().encode(message), key);
@@ -171,7 +184,7 @@ public class Server {
 		
 		//marco controlla qua la send se i parametri sono ok
 		msg.sendMessage(1, encrMessage, null);
-		
+		*/
 		
 	}
 	
