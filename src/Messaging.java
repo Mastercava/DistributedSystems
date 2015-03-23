@@ -5,12 +5,19 @@ import java.net.MulticastSocket;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+<<<<<<< HEAD
+import java.util.Base64;
+=======
+>>>>>>> origin/master
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+<<<<<<< HEAD
+=======
 import javax.crypto.SecretKey;
+>>>>>>> origin/master
 
 
 public class Messaging {
@@ -95,6 +102,42 @@ public class Messaging {
 
 	}
 	
+<<<<<<< HEAD
+	
+	
+	private byte[] encryptAsymmetric(byte[] data, Key key) {
+		
+		byte[] encryptedData = null;
+		
+		try {
+			Cipher cipher = Cipher.getInstance("RSA");
+			cipher.init(Cipher.ENCRYPT_MODE, key);
+			encryptedData = cipher.doFinal(data);
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+			encryptedData = data;
+		}
+		
+		return encryptedData;
+	}
+	
+
+	private byte[] decryptAsymmetric(byte[] encryptedData, Key key) {
+		
+		byte[] data = null;
+		
+		try {
+			Cipher cipher = Cipher.getInstance("RSA");
+			cipher.init(Cipher.DECRYPT_MODE, key);
+			data = cipher.doFinal(encryptedData);
+		} catch(Exception e) {
+			e.printStackTrace();
+			data = encryptedData;
+		}
+		
+		return data;
+=======
 	public boolean sendInitialMessage(int type, byte[] data, SecretKey publicKey) {
 		byte[] encryptedMessage = null;
 		
@@ -147,6 +190,7 @@ public class Messaging {
 		
 		
 		return true;
+>>>>>>> origin/master
 	}
 	
 }

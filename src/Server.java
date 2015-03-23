@@ -1,5 +1,7 @@
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -21,6 +23,7 @@ public class Server {
 	private Messaging multicast;
 	private FlatTable flatTable;
 	private ArrayList<Integer> clientsConnected;
+	private KeyPair keypair;
 	
 	private byte[] encrMessage; //for test
 	
@@ -33,6 +36,8 @@ public class Server {
 		
 		multicast = new Messaging(serverId);
 		multicast.initialize();
+		
+		generateKeys();
 		
 		flatTable = new FlatTable();
 		clientsConnected = new ArrayList<Integer>();
@@ -140,35 +145,14 @@ public class Server {
 		
 	}
 
-	private byte[] asymmetricEncrypt(byte[] arg, Key key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
-		
-		Cipher cipher = Cipher.getInstance("RSA");
-		byte[] toReturn = null;
-		cipher.init(Cipher.ENCRYPT_MODE, key);
-		try {
-			toReturn = cipher.doFinal(arg);
-		} catch (IllegalBlockSizeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (BadPaddingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		System.out.println("Plain Message " + Base64.getEncoder().encodeToString(arg));
-		System.out.println("Encrypted message " + Base64.getEncoder().encodeToString(toReturn));
-		
-		
-		
-		return toReturn;
-	}
 	
+	/*
 	private void initialSendDek(Key key, byte[] message) {
 		
 		/*
 		try {
 			//encryptedMsg = asymmetricEncrypt(newKeys.toString().getBytes(), key);
-			encrMessage = asymmetricEncrypt(Base64.getEncoder().encode(message), key);
+			encrMessage = encryptAsymmetric(Base64.getEncoder().encode(message), key);
 		} catch (InvalidKeyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -184,9 +168,13 @@ public class Server {
 		
 		//marco controlla qua la send se i parametri sono ok
 		msg.sendMessage(1, encrMessage, null);
+<<<<<<< HEAD
+=======
 		*/
 		
+>>>>>>> origin/master
 	}
+	*/
 	
 	private void printConnectedClients() {
 		String msg;
@@ -198,4 +186,23 @@ public class Server {
 		System.out.println(msg);
 	
 	}
+	
+	private boolean generateKeys() {
+		KeyPairGenerator keygen;
+		//Generation of asymmetric key pairs
+		try {
+			keygen = KeyPairGenerator.getInstance("RSA");
+			keygen.initialize(2048);
+			keypair = keygen.generateKeyPair();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Failed to generate keys!!");
+			return false;
+		}
+		System.out.println("Keypair generated succesfully");
+		Settings.setServerPublicKey(keypair.getPublic());
+		return true;
+	}
+	
 }

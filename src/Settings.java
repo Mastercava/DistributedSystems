@@ -3,12 +3,11 @@ import java.security.Key;
 
 public class Settings {
 	
-	public static Settings instance;
-	
 	public static byte CHECK_CODE = (byte) 123456;
 	
-	public Key SERVER_PUBLIC_KEY;
+	public static Key SERVER_PUBLIC_KEY = null;
 
+	/*
 	private Settings() {
 		
 	}
@@ -16,6 +15,11 @@ public class Settings {
 	public static Settings getInstance() {
 		if(instance == null) instance = new Settings();
 		return instance;
+	}
+	*/
+	
+	public static void setServerPublicKey(Key key) {
+		SERVER_PUBLIC_KEY = key;
 	}
 	
 	public static boolean asymmetric() {
