@@ -157,8 +157,7 @@ public class Client {
 	    		}
 	    		else if(msg.equals("JOIN")) {
 	    			System.out.println("Trying to join the group...");
-	    			String encodedKey = keypair.getPublic().toString();
-	    			multicast.sendMessage(1, encodedKey.getBytes(), null);
+	    			multicast.sendMessage(1, keypair.getPublic().getEncoded(), null);
 	    		}
 	    		else if(msg.equals("LEAVE")) {
 	    			multicast.sendMessage(2, msg.getBytes(), null);

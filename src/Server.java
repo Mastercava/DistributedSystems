@@ -112,7 +112,7 @@ public class Server {
 			
 			String s = "Client #" + clientId + " joined the group";
 			System.out.println(s);
-			multicast.sendInitialMessage(0, s.getBytes(), key);
+			multicast.sendInitialMessage(0, flatTable.changeDek().getEncoded(), key);
 			
 			printConnectedClients();
 			

@@ -102,7 +102,7 @@ public class Messaging {
 		
 		try {
 			
-			Cipher cipher = Cipher.getInstance("RSA");
+			Cipher cipher = Cipher.getInstance(publicKey.getAlgorithm());
 			cipher.init(Cipher.ENCRYPT_MODE,publicKey);
 			encryptedMessage = cipher.doFinal(data);
 		} catch (NoSuchAlgorithmException e) {
@@ -129,6 +129,16 @@ public class Messaging {
 		newData[2] = Settings.CHECK_CODE;
 		
 		System.arraycopy(data, 0, newData, 3, data.length);
+		
+		DatagramPacket packet = new DatagramPacket(newData, newData.length, group, PORT);
+
+		try {
+			socket.send(packet);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+
 		
 		
 		
