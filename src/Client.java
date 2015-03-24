@@ -168,8 +168,8 @@ public class Client {
 	    		}
 	    		else if(msg.equals("JOIN")) {
 	    			System.out.println("Trying to join the group...");
-	    			multicast.sendMessage(1, Base64.getEncoder().encode(keypair.getPublic().getEncoded()), null);
-	    			System.out.println("###########  "+Base64.getEncoder().encode(keypair.getPublic().getEncoded()));
+	    			multicast.sendMessage(1, keypair.getPublic().getEncoded(), null);
+	    			System.out.println("###########  "+byteToString(keypair.getPublic().getEncoded()));
 	    		}
 	    		else if(msg.equals("LEAVE")) {
 	    			multicast.sendMessage(2, msg.getBytes(), null);

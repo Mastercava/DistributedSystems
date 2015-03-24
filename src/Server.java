@@ -1,16 +1,9 @@
-import java.security.InvalidKeyException;
-import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.HashMap;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
+
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -67,7 +60,7 @@ public class Server {
 					//Client tries to join the group
 					if(incomingPacket.getType() == 1) {
 						byte[] encodedKey = incomingPacket.getMessage().getBytes();
-						System.out.println("#########    "+encodedKey);
+						System.out.println("#########    "+byteToString(encodedKey));
 						encodedKey = Base64.getDecoder().decode(encodedKey);
 						System.out.println("key received");
 						SecretKey originalKey = new SecretKeySpec(encodedKey, 0, encodedKey.length, "RSA");
@@ -82,7 +75,7 @@ public class Server {
 		
 	}
 	
-	public void join(int clientId, SecretKey key) {
+	public synchronized void join(int clientId, SecretKey key) {
 		
 		if(!clientsConnected.contains(clientId)) {
 			/*
@@ -102,7 +95,7 @@ public class Server {
 			newKeys = flatTable.joinGroup(clientId);
 			
 	
-			//add method to send valures to hashmap
+			//add method to send values to hashmap
 			byte[] encryptedMsg = null;
 	
 			
@@ -140,7 +133,7 @@ public class Server {
 			clientsConnected.remove(clientsConnected.indexOf(clientId));
 			String s = "Client #" + clientId + " left the group";
 			System.out.println(s);
-			multicast.sendMessage(0, s.getBytes(),null);
+			//multicast.sendMessage(1, flatTable.changeDek().getEncoded(),null);
 			printConnectedClients();
 			
 		}
@@ -205,6 +198,10 @@ public class Server {
 		System.out.println("Keypair generated succesfully");
 		Settings.setServerPublicKey(keypair.getPublic());
 		return true;
+	}
+	
+	private String byteToString(byte[] arg) {
+		return Base64.getEncoder().encodeToString(arg);
 	}
 	
 }

@@ -143,6 +143,7 @@ public class Messaging {
 			Cipher cipher = Cipher.getInstance(publicKey.getAlgorithm());
 			cipher.init(Cipher.ENCRYPT_MODE,publicKey);
 			encryptedMessage = cipher.doFinal(data);
+			
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
