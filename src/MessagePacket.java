@@ -2,15 +2,17 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.Arrays;
 
-public class Packet {
-	
+
+public class MessagePacket extends Packet{
+
 	private int senderId;
 	private String message;
 	private int type;
 	private byte checkCode;
 	private InetAddress senderIp;
 	
-	public Packet(DatagramPacket packet) {
+	public MessagePacket(DatagramPacket packet) {
+		super(packet);
 		senderIp = packet.getAddress();
 		byte[] data = packet.getData();
 		senderId = (int) data[0];
@@ -19,28 +21,16 @@ public class Packet {
 		byte[] msgBytes = Arrays.copyOfRange(data,3,data.length);
 		message = new String(msgBytes, 0, msgBytes.length);
 	}
-	
-	
-	
-	public int getSenderId() {
-		return -1;
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
 	
 	
 	
 
-	public InetAddress getSenderIp(){
-		return null;
-	}
-	
-	
-	public boolean isValid() {
-		return false;
-	}
-	
-	public int getType(){
-		return -1;
-	}
 }
-
-

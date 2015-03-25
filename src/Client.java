@@ -122,28 +122,31 @@ public class Client {
 				//Valid and clear/decryptable message 
 				if(incomingPacket.isValid()) {
 					if(incomingPacket.getType() == 0) {
+						MessagePacket incMsg = (MessagePacket) incomingPacket;
 						if (incomingPacket.getSenderId() == 0) {
-							System.out.println("Server ##" + ": " + incomingPacket.getMessage());
+							System.out.println("Server ##" + ": " + incMsg.getMessage());
 						} else {
-							System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
+							System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incMsg.getMessage());
 						}
 						
 						
 					}
 					else {
 						if (incomingPacket.getSenderId() == 0) {
-							byte[] dekIncomed;
-							byte[] dekEncrypted;
+							Key dekIncomed;
+							
 							System.out.println("Something Received from server");
-							dekIncomed = incomingPacket.getMessage().getBytes();
-							dekEncrypted = multicast.decryptAsymmetric(dekIncomed, keypair.getPrivate());
-							dek = new SecretKeySpec(dekIncomed, "AES");
+							KeyPacket kp = (KeyPacket) incomingPacket;
+							dekIncomed = kp.getKey();
+							dek = (SecretKey)dekIncomed;
+							
 						}
 					}
 				}
 				//Cannot decrypt
 				else {
-					System.out.println("Unable to decrypt: " + incomingPacket.getMessage());
+		
+					System.out.println("Unable to decrypt: " + incomingPacket.toString());
 				}
 				
 			}
@@ -168,8 +171,11 @@ public class Client {
 	    		}
 	    		else if(msg.equals("JOIN")) {
 	    			System.out.println("Trying to join the group...");
-	    			multicast.sendMessage(1, keypair.getPublic().getEncoded(), null);
-	    			System.out.println("###########  "+byteToString(keypair.getPublic().getEncoded()));
+	    			//multicast.sendMessage(1, keypair.getPublic().getEncoded(), null);
+	    			multicast.sendBootKeyMessage(1, keypair.getPublic());
+	    			
+	    			System.out.println("Key sent");
+	    			//System.out.println("###########  "+byteToString(keypair.getPublic().getEncoded()));
 	    		}
 	    		else if(msg.equals("LEAVE")) {
 	    			multicast.sendMessage(2, msg.getBytes(), null);

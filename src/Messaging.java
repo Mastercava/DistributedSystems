@@ -1,17 +1,20 @@
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
+import java.security.PublicKey;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-
 import javax.crypto.SecretKey;
 
 
@@ -52,6 +55,56 @@ public class Messaging {
 		return true;
 	}
 	
+	public boolean sendKeyMessage(int type, SecretKey key)  {
+		ByteArrayOutputStream b = new ByteArrayOutputStream();
+		DatagramPacket dgp = new DatagramPacket(b.toByteArray(),b.toByteArray().length,group,PORT);
+		KeyPacket keyPacket = new KeyPacket(dgp, type, key);
+		ObjectOutputStream oos;
+		try {
+			oos = new ObjectOutputStream(b);
+			oos.writeObject(keyPacket);
+			
+			oos.flush();
+			byte[] buf = b.toByteArray();
+			DatagramPacket packet = new DatagramPacket(buf,buf.length,group,PORT);
+			socket.send(packet);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			
+			return false;
+		}
+		
+		return true;
+		
+	}
+	
+	public KeyPacket receiveKeyPacket()  {
+		
+		DatagramPacket packet;
+		byte[] buffer = new byte[BUFFER_SIZE];
+	    packet = new DatagramPacket(buffer, buffer.length );
+	    KeyPacket keyPacket = null;
+	    try {
+			socket.receive(packet);
+			ByteArrayInputStream b = new ByteArrayInputStream(buffer);
+		    ObjectInputStream ois = new ObjectInputStream(b);
+			keyPacket = (KeyPacket)ois.readObject();
+		} catch (IOException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			
+		}
+		
+	    
+		
+		
+		
+		return keyPacket;
+		
+	}
+	
+	
 	public boolean sendMessage(int type, byte[] data, Key encryptionKey) {
 		
 		byte[] newData = new byte[data.length+3];
@@ -85,13 +138,18 @@ public class Messaging {
 
 			DatagramPacket msgPacket = new DatagramPacket(buf, buf.length);
 			socket.receive(msgPacket);
-			return new Packet(msgPacket);
+			ByteArrayInputStream b = new ByteArrayInputStream(buf);
+		    ObjectInputStream ois = new ObjectInputStream(b);
+		    Packet packet = (Packet)ois.readObject();
+			
+			
+			return packet;
+			
 
-		} catch (IOException e) {
+		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 			return null;
-		}
-		
+		} 		
 		
 			
 
@@ -133,7 +191,7 @@ public class Messaging {
 		return data;
 	}
 	
-	public boolean sendInitialMessage(int type, byte[] data, SecretKey publicKey) {
+	public boolean sendInitialMessage(int type, byte[] data, Key publicKey) {
 		byte[] encryptedMessage = null;
 		
 		System.out.println("########  " + publicKey.getAlgorithm());
@@ -144,23 +202,10 @@ public class Messaging {
 			cipher.init(Cipher.ENCRYPT_MODE,publicKey);
 			encryptedMessage = cipher.doFinal(data);
 			
-		} catch (NoSuchAlgorithmException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalBlockSizeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (BadPaddingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		}	
 		System.out.println("Encryption with RSA done");
 		byte[] newData = new byte[data.length+3];
 		newData[0] = (byte) senderId;
@@ -173,8 +218,8 @@ public class Messaging {
 
 		try {
 			socket.send(packet);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception e1) {
+			e1.printStackTrace();
 			return false;
 		}
 
@@ -186,6 +231,54 @@ public class Messaging {
 		
 		
 		return true;
+		}
+		
+	
+
+	public boolean sendBootKeyMessage(int i, PublicKey public1) {
+		ByteArrayOutputStream b = new ByteArrayOutputStream();
+		DatagramPacket packetToSend = new DatagramPacket(b.toByteArray(),b.toByteArray().length,group,PORT);
+		
+		PublicKeyPacket pKeyPacket = new PublicKeyPacket(packetToSend,senderId,public1);
+		ObjectOutputStream oos;
+		try {
+			oos = new ObjectOutputStream(b);
+			oos.writeObject(pKeyPacket);
+			
+			oos.flush();
+			byte[] buf = b.toByteArray();
+			packetToSend = new DatagramPacket(buf,buf.length,group,PORT);
+			socket.send(packetToSend);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			
+			return false;
+		}
+		
+		return true;
+		
+	}
+	
+	public PublicKeyPacket receiveBootKeyMessage() {
+		
+		DatagramPacket packet;
+		byte[] buffer = new byte[BUFFER_SIZE];
+	    packet = new DatagramPacket(buffer, buffer.length );
+	    PublicKeyPacket keyPacket = null;
+	    try {
+			socket.receive(packet);
+			ByteArrayInputStream b = new ByteArrayInputStream(buffer);
+		    ObjectInputStream ois = new ObjectInputStream(b);
+			keyPacket = (PublicKeyPacket)ois.readObject();
+		} catch (IOException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			
+		}
+		
+	    return keyPacket;
+		
 	}
 	
 }

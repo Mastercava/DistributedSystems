@@ -1,11 +1,9 @@
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Base64;
-
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 
 
@@ -48,23 +46,26 @@ public class Server {
 	public void startReceiving() {
 		
 		Packet incomingPacket;
+		PublicKeyPacket pkp;
 		
 		while(true) {
 			
 			incomingPacket = multicast.receiveMessage();
+			
+			pkp = multicast.receiveBootKeyMessage();
 			if(incomingPacket.isValid()) {
 				if(incomingPacket.getType() == 0) {
-					System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
+					System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getSenderIp());
 				}
 				else {
 					//Client tries to join the group
 					if(incomingPacket.getType() == 1) {
-						byte[] encodedKey = incomingPacket.getMessage().getBytes();
-						System.out.println("#########    "+byteToString(encodedKey));
-						encodedKey = Base64.getDecoder().decode(encodedKey);
-						System.out.println("key received");
-						SecretKey originalKey = new SecretKeySpec(encodedKey, 0, encodedKey.length, "RSA");
-						join(incomingPacket.getSenderId(), originalKey);
+						
+						
+						
+						PublicKey key = pkp.getKey();
+						System.out.println("######   " + key.getAlgorithm() + " ### " + key.toString());
+						join(incomingPacket.getSenderId(), key);
 					}
 					else if(incomingPacket.getType() == 2) {
 						leave(incomingPacket.getSenderId());
@@ -75,7 +76,7 @@ public class Server {
 		
 	}
 	
-	public synchronized void join(int clientId, SecretKey key) {
+	public synchronized void join(int clientId, Key key) {
 		
 		if(!clientsConnected.contains(clientId)) {
 			/*
