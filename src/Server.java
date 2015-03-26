@@ -118,14 +118,16 @@ public class Server {
 			
 			*/
 		
-			multicast.sendMessage(2, ("ciao").getBytes(), clientPublicKey);
+			//multicast.sendMessage(2, ("ciao").getBytes(), clientPublicKey);
 			
 			//Add the client to the list of clients connected
 			clientsConnected.add(clientId);
 			
 			String s = "Client #" + clientId + " joined the group";
 			System.out.println(s);
-			//multicast.sendInitialMessage(1, flatTable.changeDek().getEncoded(), clientPublicKey);
+			byte[] genKey = flatTable.changeDek().getEncoded();
+			multicast.sendMessage(2, Base64.getEncoder().encode(genKey), clientPublicKey);
+			System.out.println("DEKKKKK     "  + Base64.getEncoder().encodeToString(genKey));
 			
 			printConnectedClients();
 			

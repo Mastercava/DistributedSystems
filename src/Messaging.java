@@ -61,7 +61,12 @@ public class Messaging {
 		
 		//If key provided, encrypt message
 		if(encryptionKey != null) {
-			newData = encryptAsymmetric(newData, encryptionKey);
+			if (encryptionKey.getAlgorithm().equals(Settings.ENCRYPTION_ALGORITHM)) {
+				newData = encryptSymmetric(newData, encryptionKey);
+			} else {
+				newData = encryptAsymmetric(newData, encryptionKey);
+			}
+			
 			System.out.println("HOST #" + senderId + " SENDING ENCRYPTED DATA!!");
 		}
 		
@@ -77,6 +82,26 @@ public class Messaging {
 		return true;
 	}
 	
+	private byte[] encryptSymmetric(byte[] data, Key key) {
+		System.out.println("ORIGINAL DATA LENGHT: " + data.length);
+		
+		byte[] encryptedData = null;
+		
+		try {
+			Cipher cipher = Cipher.getInstance(Settings.ENCRYPTION_ALGORITHM);
+			cipher.init(Cipher.ENCRYPT_MODE, key);
+			encryptedData = cipher.doFinal(data);
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+			encryptedData = data;
+		}
+		
+		System.out.println("ENCRYPTED DATA LENGHT: " + encryptedData.length);
+		
+		return encryptedData;
+	}
+
 	public Packet receiveMessage(List<Key> keys) {
 		
 		byte[] buf = new byte[BUFFER_SIZE];
@@ -128,18 +153,14 @@ public class Messaging {
 	}
 	
 
-	static public byte[] decryptAsymmetric(byte[] encryptedData, Key key) {
+	static public byte[] decryptAsymmetric(byte[] encryptedData, Key key) throws Exception {
 		
 		byte[] data = null;
 		
-		try {
-			Cipher cipher = Cipher.getInstance("RSA");
-			cipher.init(Cipher.DECRYPT_MODE, key);
-			data = cipher.doFinal(encryptedData);
-		} catch(Exception e) {
-			//e.printStackTrace();
-			data = encryptedData;
-		}
+		Cipher cipher = Cipher.getInstance("RSA");
+		cipher.init(Cipher.DECRYPT_MODE, key);
+		data = cipher.doFinal(encryptedData);
+		
 		
 		return data;
 	}
@@ -186,6 +207,19 @@ public class Messaging {
 		
 		
 		return true;
+	}
+
+	public static  byte[] decryptSymmetric(byte[] encryptedData, Key k) throws Exception {
+		byte[] data = null;
+
+
+		Cipher cipher = Cipher.getInstance(Settings.ENCRYPTION_ALGORITHM);
+		cipher.init(Cipher.DECRYPT_MODE, k);
+		data = cipher.doFinal(encryptedData);
+
+
+		return data;
+		
 	}
 	
 }

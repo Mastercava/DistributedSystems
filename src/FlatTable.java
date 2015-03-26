@@ -10,7 +10,6 @@ import javax.crypto.SecretKey;
 public class FlatTable {
 	
 	private final int SUPPORTED_HOSTS = 8;
-	private final String ENCRYPTION_ALGORITHM = "DES";
 	private int bitsNeeded;
 	
 	private SecretKey[][] flatTable;
@@ -23,13 +22,13 @@ public class FlatTable {
 		flatTable = new SecretKey[2][bitsNeeded];
 		System.out.println("Flat table with " + bitsNeeded + " bits created, supporting " + SUPPORTED_HOSTS + " hosts");
 		try {
-			keygen = KeyGenerator.getInstance(ENCRYPTION_ALGORITHM);
-			keygen.init(56);
+			keygen = KeyGenerator.getInstance(Settings.ENCRYPTION_ALGORITHM);
+			keygen.init(128);
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
 		
-		System.out.println("Using encryption algorithm \"" + ENCRYPTION_ALGORITHM + "\"");
+		System.out.println("Using encryption algorithm \"" + Settings.ENCRYPTION_ALGORITHM + "\"");
 		dek = generateKey();
 		System.out.println("DEK generated: " + Utilities.keyToString(dek));
 		

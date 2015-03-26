@@ -59,11 +59,26 @@ public class Packet {
 		
 		for(Key k : keys) {
 			
-			byte[] decryptedData = Messaging.decryptAsymmetric(rawData, k);
+			byte[] decryptedData = rawData;
+			if (k.getAlgorithm().equals("RSA")) {
+				try {
+					decryptedData = Messaging.decryptAsymmetric(rawData, k);
+				} catch (Exception e) {
+					System.out.println("Message cannot be decrypted by this key " + k.toString());
+				}
+				
+			} else {
+				try {
+					decryptedData = Messaging.decryptSymmetric(rawData, k);
+				} catch (Exception e) {
+					System.out.println("Message cannot be decrypted by this key " + k.toString());
+				}
+			}
+			
 			//System.out.println("ATTEMPT DECRYPTED MESSAGE OF LENGHT " + decryptedData.length + "...");
 			
 			//Decryption with key k successful
-			if(decryptedData[2] == Settings.CHECK_CODE) {
+			if(decryptedData[2] == Settings.CHECK_CODE && decryptedData != null) {
 				System.out.println("DECRYPTION OK!!!!");
 				rawData = decryptedData;
 				decodeRawData();

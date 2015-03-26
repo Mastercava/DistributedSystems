@@ -1,11 +1,13 @@
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -137,7 +139,11 @@ public class Client {
 					}
 					//Just joined, first key from server
 					else if(incomingPacket.getType() == 2) {
-						System.out.println("Server approved join request: " + incomingPacket.getMessage());
+						System.out.println("Server approved join request: " );
+						byte[] incMsg = Base64.getDecoder().decode(incomingPacket.getMessage());
+						dek = new SecretKeySpec(incMsg, 0, incMsg.length, Settings.ENCRYPTION_ALGORITHM);
+						keys.add(dek);
+						System.out.println("   " + byteToString(dek.getEncoded()));
 					}
 					
 					/*
@@ -188,7 +194,10 @@ public class Client {
 	    			System.out.println("Trying to leave the group...");
 	    		}
 	    		else {
-	    			multicast.sendMessage(0, msg.getBytes(), null);
+	    			if (dek != null) {
+	    				multicast.sendMessage(0, msg.getBytes(), dek);
+	    			}
+	    			
 	    		}
 			}
 
