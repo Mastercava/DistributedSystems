@@ -7,6 +7,7 @@ import java.util.List;
 
 public class Packet {
 
+	private int length;
 	private byte[] rawData;
 	private byte[] data;
 	private int senderId;
@@ -16,8 +17,11 @@ public class Packet {
 	private InetAddress senderIp;
 	
 	public Packet(DatagramPacket packet) {
+		length = packet.getLength();
 		senderIp = packet.getAddress();
-		rawData = packet.getData();
+		//rawData = packet.getData();
+		rawData = Arrays.copyOfRange(packet.getData(),0,length);
+		//System.out.println("RECEIVED MESSAGE FORMALLY LONG " + rawData.length + ", ACTUALLY LONG " + length);
 		decodeRawData();
 	}
 	
@@ -56,7 +60,7 @@ public class Packet {
 		for(Key k : keys) {
 			
 			byte[] decryptedData = Messaging.decryptAsymmetric(rawData, k);
-			System.out.println("ATTEMPT DECRYPTED MESSAGE OF LENGHT " + decryptedData.length + "...");
+			//System.out.println("ATTEMPT DECRYPTED MESSAGE OF LENGHT " + decryptedData.length + "...");
 			
 			//Decryption with key k successful
 			if(decryptedData[2] == Settings.CHECK_CODE) {
