@@ -51,7 +51,7 @@ public class Server {
 		
 		while(true) {
 			
-			incomingPacket = multicast.receiveMessage();
+			incomingPacket = multicast.receiveMessage(null);
 			if(incomingPacket.isValid()) {
 				if(incomingPacket.getType() == 0) {
 					System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
@@ -59,13 +59,16 @@ public class Server {
 				else {
 					//Client tries to join the group
 					if(incomingPacket.getType() == 1) {
-						byte[] encodedKey = incomingPacket.getMessage().getBytes();
-						System.out.println("#########    "+byteToString(encodedKey));
-						encodedKey = Base64.getDecoder().decode(encodedKey);
-						System.out.println("key received");
-						SecretKey originalKey = new SecretKeySpec(encodedKey, 0, encodedKey.length, "RSA");
-						join(incomingPacket.getSenderId(), originalKey);
+						byte[] clientPublicKey = incomingPacket.getMessage().getBytes();
+						
+						
+						//System.out.println("#########    "+byteToString(encodedKey));
+						//encodedKey = Base64.getDecoder().decode(encodedKey);
+						//System.out.println("key received");
+						//SecretKey originalKey = new SecretKeySpec(encodedKey, 0, encodedKey.length, "RSA");
+						//join(incomingPacket.getSenderId(), originalKey);
 					}
+					//Client leaves the group
 					else if(incomingPacket.getType() == 2) {
 						leave(incomingPacket.getSenderId());
 					}
@@ -112,7 +115,7 @@ public class Server {
 			
 			String s = "Client #" + clientId + " joined the group";
 			System.out.println(s);
-			multicast.sendInitialMessage(1, flatTable.changeDek().getEncoded(), key);
+			//multicast.sendInitialMessage(1, flatTable.changeDek().getEncoded(), key);
 			
 			printConnectedClients();
 			
@@ -187,7 +190,7 @@ public class Server {
 		//Generation of asymmetric key pairs
 		try {
 			keygen = KeyPairGenerator.getInstance("RSA");
-			keygen.initialize(2048);
+			keygen.initialize(Settings.RSA_KEYSIZE);
 			keypair = keygen.generateKeyPair();
 			
 		} catch (Exception e) {
@@ -197,6 +200,7 @@ public class Server {
 		}
 		System.out.println("Keypair generated succesfully");
 		Settings.setServerPublicKey(keypair.getPublic());
+		System.out.println("Keys long: " + keypair.getPrivate().getEncoded().length + " , " + keypair.getPublic().getEncoded().length);
 		return true;
 	}
 	

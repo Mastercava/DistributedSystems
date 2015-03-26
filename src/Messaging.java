@@ -6,6 +6,7 @@ import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.List;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -19,7 +20,7 @@ public class Messaging {
 
 	final static String GROUP_ADDR = "228.5.6.7";
 	final static int PORT = 6789;
-	final static int BUFFER_SIZE = 256;
+	final static int BUFFER_SIZE = 512;
 	
 	private static InetAddress group;
 	private static MulticastSocket socket;
@@ -77,7 +78,7 @@ public class Messaging {
 		return true;
 	}
 	
-	public Packet receiveMessage() {
+	public Packet receiveMessage(List<Key> keys) {
 		
 		byte[] buf = new byte[BUFFER_SIZE];
 
@@ -85,7 +86,14 @@ public class Messaging {
 
 			DatagramPacket msgPacket = new DatagramPacket(buf, buf.length);
 			socket.receive(msgPacket);
-			return new Packet(msgPacket);
+			Packet pkt = new Packet(msgPacket);
+			
+			//Decrypts if necessary
+			if(!pkt.isValid() && keys != null) {
+				pkt.tryDecryption(keys);
+			}
+			
+			return pkt;
 
 		} catch (IOException e) {
 			e.printStackTrace();

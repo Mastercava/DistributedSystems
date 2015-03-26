@@ -91,7 +91,7 @@ public class Client {
 		//Generation of asymmetric key pairs
 		try {
 			keygen = KeyPairGenerator.getInstance("RSA");
-			keygen.initialize(512);
+			keygen.initialize(Settings.RSA_KEYSIZE);
 			keypair = keygen.generateKeyPair();
 			
 		} catch (Exception e) {
@@ -118,7 +118,7 @@ public class Client {
 			
 			while(!terminateFlag) {
 				
-				incomingPacket = multicast.receiveMessage();
+				incomingPacket = multicast.receiveMessage(null);
 				//Valid and clear/decryptable message 
 				if(incomingPacket.isValid()) {
 					if(incomingPacket.getType() == 0) {

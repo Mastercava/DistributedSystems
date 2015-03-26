@@ -1,10 +1,14 @@
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.security.Key;
 import java.util.Arrays;
+import java.util.List;
 
 
 public class Packet {
 
+	private byte[] rawData;
+	private byte[] data;
 	private int senderId;
 	private String message;
 	private int type;
@@ -13,12 +17,16 @@ public class Packet {
 	
 	public Packet(DatagramPacket packet) {
 		senderIp = packet.getAddress();
-		byte[] data = packet.getData();
-		senderId = (int) data[0];
-		type = (int) data[1];
-		checkCode = data[2];
-		byte[] msgBytes = Arrays.copyOfRange(data,3,data.length);
-		message = new String(msgBytes, 0, msgBytes.length);
+		rawData = packet.getData();
+		decodeRawData();
+	}
+	
+	private void decodeRawData() {
+		senderId = (int) rawData[0];
+		type = (int) rawData[1];
+		checkCode = rawData[2];
+		data = Arrays.copyOfRange(rawData,3,rawData.length);
+		message = new String(data, 0, data.length);
 	}
 	
 	public int getSenderId() {
@@ -41,4 +49,19 @@ public class Packet {
 		return checkCode == Settings.CHECK_CODE;
 	}
 
+	public void tryDecryption(List<Key> keys) {
+		if(isValid() || keys == null) return;
+		for(Key k : keys) {
+			//decryptedData = ...
+			/*
+			//Decryption with key k successful
+			if(decryptedData[2] == Settings.CHECK_CODE) {
+				rawData = decryptedData;
+				decodeRawData();
+				break;
+			}
+			//Otherwise try with another key
+			*/
+		}
+	}
 }
