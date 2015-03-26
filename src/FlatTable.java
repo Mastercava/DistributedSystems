@@ -24,6 +24,7 @@ public class FlatTable {
 		System.out.println("Flat table with " + bitsNeeded + " bits created, supporting " + SUPPORTED_HOSTS + " hosts");
 		try {
 			keygen = KeyGenerator.getInstance(ENCRYPTION_ALGORITHM);
+			keygen.init(56);
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}

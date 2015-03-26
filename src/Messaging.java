@@ -5,7 +5,7 @@ import java.net.MulticastSocket;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
+import java.security.PublicKey;
 import java.util.List;
 
 import javax.crypto.BadPaddingException;
@@ -13,14 +13,12 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import javax.crypto.SecretKey;
-
 
 public class Messaging {
 
 	final static String GROUP_ADDR = "228.5.6.7";
 	final static int PORT = 6789;
-	final static int BUFFER_SIZE = 512;
+	final static int BUFFER_SIZE = 2048;
 	
 	private static InetAddress group;
 	private static MulticastSocket socket;
@@ -141,8 +139,8 @@ public class Messaging {
 		return data;
 	}
 	
-	public boolean sendInitialMessage(int type, byte[] data, SecretKey publicKey) {
-		byte[] encryptedMessage = null;
+	public boolean sendInitialMessage(int type, byte[] data, Key publicKey) {
+		byte[] encryptedMessage = new byte[publicKey.getEncoded().length];
 		
 		System.out.println("########  " + publicKey.getAlgorithm());
 		
@@ -152,30 +150,20 @@ public class Messaging {
 			cipher.init(Cipher.ENCRYPT_MODE,publicKey);
 			encryptedMessage = cipher.doFinal(data);
 			
-		} catch (NoSuchAlgorithmException e) {
+		} catch (NoSuchAlgorithmException |NoSuchPaddingException | InvalidKeyException | 
+					IllegalBlockSizeException | BadPaddingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalBlockSizeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (BadPaddingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		 
 		}
 		
 		System.out.println("Encryption with RSA done");
-		byte[] newData = new byte[data.length+3];
+		byte[] newData = new byte[encryptedMessage.length+3];
 		newData[0] = (byte) senderId;
 		newData[1] = (byte) type;
 		newData[2] = Settings.CHECK_CODE;
 		
-		System.arraycopy(data, 0, newData, 3, data.length);
+		System.arraycopy(encryptedMessage, 0, newData, 3, data.length);
 		
 		DatagramPacket packet = new DatagramPacket(newData, newData.length, group, PORT);
 

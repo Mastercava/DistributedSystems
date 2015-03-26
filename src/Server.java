@@ -1,11 +1,13 @@
+import java.security.Key;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Base64;
-
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 
 
@@ -59,17 +61,24 @@ public class Server {
 				else {
 					//Client tries to join the group
 					if(incomingPacket.getType() == 1) {
-						byte[] clientPublicKey = incomingPacket.getMessage().getBytes();
+						byte[] encodedKey = incomingPacket.getData();
+												
+						PublicKey clientPublicKey = null;
+						try {
+							clientPublicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(encodedKey));
+						} catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							
+						}
 						
+						System.out.println("keyyyyyyyyyyyyyyy");
+						System.out.println("#########    "+ byteToString(clientPublicKey.getEncoded())+ "  " +clientPublicKey.getAlgorithm());
 						
-						//System.out.println("#########    "+byteToString(encodedKey));
-						//encodedKey = Base64.getDecoder().decode(encodedKey);
-						//System.out.println("key received");
-						//SecretKey originalKey = new SecretKeySpec(encodedKey, 0, encodedKey.length, "RSA");
-						//join(incomingPacket.getSenderId(), originalKey);
+						join(incomingPacket.getSenderId(), clientPublicKey);
 					}
 					//Client leaves the group
-					else if(incomingPacket.getType() == 2) {
+					else if(incomingPacket.getType() == 3) {
 						leave(incomingPacket.getSenderId());
 					}
 				}
@@ -78,7 +87,7 @@ public class Server {
 		
 	}
 	
-	public synchronized void join(int clientId, SecretKey key) {
+	public synchronized void join(int clientId, Key clientPublicKey) {
 		
 		if(!clientsConnected.contains(clientId)) {
 			/*
@@ -115,7 +124,7 @@ public class Server {
 			
 			String s = "Client #" + clientId + " joined the group";
 			System.out.println(s);
-			//multicast.sendInitialMessage(1, flatTable.changeDek().getEncoded(), key);
+			multicast.sendInitialMessage(1, flatTable.changeDek().getEncoded(), clientPublicKey);
 			
 			printConnectedClients();
 			
