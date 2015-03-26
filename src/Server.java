@@ -209,7 +209,7 @@ public class Server {
 			return false;
 		}
 		System.out.println("Keypair generated succesfully");
-		Settings.setServerPublicKey(keypair.getPublic());
+		Settings.setServerPublicKey(keypair.getPublic()); //USELESS!!!
 		System.out.println("Keys long: " + keypair.getPrivate().getEncoded().length + " , " + keypair.getPublic().getEncoded().length);
 		return true;
 	}

@@ -5,7 +5,7 @@ public class Settings {
 	
 	public static byte CHECK_CODE = (byte) 123456;
 	
-	public static Key SERVER_PUBLIC_KEY = null;
+	public static Key SERVER_PUBLIC_KEY = null; //ACTUALLY USELESS!!
 	public static int RSA_KEYSIZE = 2048; 
 
 	/*

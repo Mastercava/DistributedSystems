@@ -62,7 +62,7 @@ public class Messaging {
 		//If key provided, encrypt message
 		if(encryptionKey != null) {
 			newData = encryptAsymmetric(newData, encryptionKey);
-			System.out.println("DATA ENCRYPTED!!");
+			System.out.println("HOST #" + senderId + " SENDING ENCRYPTED DATA!!");
 		}
 		
 		DatagramPacket packet = new DatagramPacket(newData, newData.length, group, PORT);

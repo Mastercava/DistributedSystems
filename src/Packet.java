@@ -51,6 +51,8 @@ public class Packet {
 
 	public void tryDecryption(List<Key> keys) {
 		if(isValid() || keys == null) return;
+		System.out.println("TRYING TO DECRYPT MESSAGE...");
+		
 		for(Key k : keys) {
 			
 			byte[] decryptedData = Messaging.decryptAsymmetric(rawData, k);
