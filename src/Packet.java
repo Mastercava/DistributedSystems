@@ -51,11 +51,12 @@ public class Packet {
 
 	public void tryDecryption(List<Key> keys) {
 		if(isValid() || keys == null) return;
-		System.out.println("TRYING TO DECRYPT MESSAGE...");
+		System.out.println("TRYING TO DECRYPT MESSAGE OF LENGHT " + rawData.length + "...");
 		
 		for(Key k : keys) {
 			
 			byte[] decryptedData = Messaging.decryptAsymmetric(rawData, k);
+			System.out.println("ATTEMPT DECRYPTED MESSAGE OF LENGHT " + decryptedData.length + "...");
 			
 			//Decryption with key k successful
 			if(decryptedData[2] == Settings.CHECK_CODE) {

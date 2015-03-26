@@ -18,7 +18,7 @@ public class Messaging {
 
 	final static String GROUP_ADDR = "228.5.6.7";
 	final static int PORT = 6789;
-	final static int BUFFER_SIZE = 2048;
+	final static int BUFFER_SIZE = 256;
 	
 	private static InetAddress group;
 	private static MulticastSocket socket;
@@ -108,6 +108,8 @@ public class Messaging {
 	
 	static public byte[] encryptAsymmetric(byte[] data, Key key) {
 		
+		System.out.println("ORIGINAL DATA LENGHT: " + data.length);
+		
 		byte[] encryptedData = null;
 		
 		try {
@@ -119,6 +121,8 @@ public class Messaging {
 			e.printStackTrace();
 			encryptedData = data;
 		}
+		
+		System.out.println("ENCRYPTED DATA LENGHT: " + encryptedData.length);
 		
 		return encryptedData;
 	}
