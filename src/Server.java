@@ -62,6 +62,7 @@ public class Server {
 					//Client tries to join the group
 					if(incomingPacket.getType() == 1) {
 						byte[] encodedKey = incomingPacket.getData();
+
 												
 						PublicKey clientPublicKey = null;
 						try {
@@ -73,7 +74,8 @@ public class Server {
 						}
 						
 						System.out.println("keyyyyyyyyyyyyyyy");
-						System.out.println("#########    "+ byteToString(clientPublicKey.getEncoded())+ "  " +clientPublicKey.getAlgorithm());
+						System.out.println("#########    " + clientPublicKey.getAlgorithm()+ "  " + byteToString(clientPublicKey.getEncoded()));
+						
 						
 						join(incomingPacket.getSenderId(), clientPublicKey);
 					}
