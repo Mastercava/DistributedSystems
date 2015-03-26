@@ -1,3 +1,4 @@
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.util.ArrayList;
@@ -59,17 +60,16 @@ public class Server {
 				else {
 					//Client tries to join the group
 					if(incomingPacket.getType() == 1) {
-						byte[] clientPublicKey = incomingPacket.getMessage().getBytes();
+						byte[] encodedKey = incomingPacket.getData();
+						System.out.println("#########    "+ byteToString(encodedKey));
+												
+						SecretKey clientPublicKey = new SecretKeySpec(encodedKey, 0, encodedKey.length, "RSA");
+						System.out.println("#########    "+ byteToString(clientPublicKey.getEncoded()));
 						
-						
-						//System.out.println("#########    "+byteToString(encodedKey));
-						//encodedKey = Base64.getDecoder().decode(encodedKey);
-						//System.out.println("key received");
-						//SecretKey originalKey = new SecretKeySpec(encodedKey, 0, encodedKey.length, "RSA");
-						//join(incomingPacket.getSenderId(), originalKey);
+						join(incomingPacket.getSenderId(), clientPublicKey);
 					}
 					//Client leaves the group
-					else if(incomingPacket.getType() == 2) {
+					else if(incomingPacket.getType() == 3) {
 						leave(incomingPacket.getSenderId());
 					}
 				}
@@ -78,7 +78,7 @@ public class Server {
 		
 	}
 	
-	public synchronized void join(int clientId, SecretKey key) {
+	public synchronized void join(int clientId, Key clientPublicKey) {
 		
 		if(!clientsConnected.contains(clientId)) {
 			/*
