@@ -52,16 +52,18 @@ public class Packet {
 	public void tryDecryption(List<Key> keys) {
 		if(isValid() || keys == null) return;
 		for(Key k : keys) {
-			//decryptedData = ...
-			/*
+			
+			byte[] decryptedData = Messaging.decryptAsymmetric(rawData, k);
+			
 			//Decryption with key k successful
 			if(decryptedData[2] == Settings.CHECK_CODE) {
+				System.out.println("DECRYPTION OK!!!!");
 				rawData = decryptedData;
 				decodeRawData();
 				break;
 			}
 			//Otherwise try with another key
-			*/
+
 		}
 	}
 

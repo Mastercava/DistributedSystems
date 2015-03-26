@@ -61,7 +61,8 @@ public class Messaging {
 		
 		//If key provided, encrypt message
 		if(encryptionKey != null) {
-			
+			newData = encryptAsymmetric(newData, encryptionKey);
+			System.out.println("DATA ENCRYPTED!!");
 		}
 		
 		DatagramPacket packet = new DatagramPacket(newData, newData.length, group, PORT);
@@ -105,7 +106,7 @@ public class Messaging {
 	
 	
 	
-	public byte[] encryptAsymmetric(byte[] data, Key key) {
+	static public byte[] encryptAsymmetric(byte[] data, Key key) {
 		
 		byte[] encryptedData = null;
 		
@@ -123,7 +124,7 @@ public class Messaging {
 	}
 	
 
-	public byte[] decryptAsymmetric(byte[] encryptedData, Key key) {
+	static public byte[] decryptAsymmetric(byte[] encryptedData, Key key) {
 		
 		byte[] data = null;
 		
@@ -132,7 +133,7 @@ public class Messaging {
 			cipher.init(Cipher.DECRYPT_MODE, key);
 			data = cipher.doFinal(encryptedData);
 		} catch(Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			data = encryptedData;
 		}
 		
@@ -150,8 +151,7 @@ public class Messaging {
 			cipher.init(Cipher.ENCRYPT_MODE,publicKey);
 			encryptedMessage = cipher.doFinal(data);
 			
-		} catch (NoSuchAlgorithmException |NoSuchPaddingException | InvalidKeyException | 
-					IllegalBlockSizeException | BadPaddingException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		 

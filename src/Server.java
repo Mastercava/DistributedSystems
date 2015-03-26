@@ -8,6 +8,10 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 
 
@@ -51,9 +55,12 @@ public class Server {
 		
 		Packet incomingPacket;
 		
+		List<Key> keys = new ArrayList<Key>();
+		keys.add(keypair.getPrivate());
+		
 		while(true) {
 			
-			incomingPacket = multicast.receiveMessage(null);
+			incomingPacket = multicast.receiveMessage(keys);
 			if(incomingPacket.isValid()) {
 				if(incomingPacket.getType() == 0) {
 					System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
@@ -63,21 +70,21 @@ public class Server {
 					if(incomingPacket.getType() == 1) {
 						byte[] encodedKey = incomingPacket.getData();
 
-												
+											
 						PublicKey clientPublicKey = null;
 						try {
 							clientPublicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(encodedKey));
-						} catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-							// TODO Auto-generated catch block
+						} catch (Exception e) {
 							e.printStackTrace();
 							
 						}
 						
-						System.out.println("keyyyyyyyyyyyyyyy");
-						System.out.println("#########    " + clientPublicKey.getAlgorithm()+ "  " + byteToString(clientPublicKey.getEncoded()));
 						
+						//SecretKey clientPublicKey = new SecretKeySpec(encodedKey, 0, encodedKey.length, "RSA");
+						System.out.println("#########  " + byteToString(clientPublicKey.getEncoded()));
 						
 						join(incomingPacket.getSenderId(), clientPublicKey);
+						
 					}
 					//Client leaves the group
 					else if(incomingPacket.getType() == 3) {
@@ -93,16 +100,6 @@ public class Server {
 		
 		if(!clientsConnected.contains(clientId)) {
 			/*
-			Messaging msg = new Messaging(serverId);
-			String str = " ";
-			if (!clientsConnected.isEmpty()) {
-				if (clientsConnected.get(clientId) == null) {
-					str = "Client not connected: Trying a Connection";
-					
-				} else {
-					str = "Client already connected";
-				}
-			}
 			
 			msg.sendMessage(0, str.getBytes());
 			HashMap<Integer[], SecretKey> newKeys;
@@ -121,12 +118,14 @@ public class Server {
 			
 			*/
 		
-			//add the client to the list of clients connected
+			multicast.sendMessage(2, ("ciao").getBytes(), clientPublicKey);
+			
+			//Add the client to the list of clients connected
 			clientsConnected.add(clientId);
 			
 			String s = "Client #" + clientId + " joined the group";
 			System.out.println(s);
-			multicast.sendInitialMessage(1, flatTable.changeDek().getEncoded(), clientPublicKey);
+			//multicast.sendInitialMessage(1, flatTable.changeDek().getEncoded(), clientPublicKey);
 			
 			printConnectedClients();
 			
@@ -217,6 +216,7 @@ public class Server {
 	
 	private String byteToString(byte[] arg) {
 		return Base64.getEncoder().encodeToString(arg);
+		//return new String(arg);
 	}
 	
 }

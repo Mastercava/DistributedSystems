@@ -6,7 +6,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.Scanner;
 
 import javax.crypto.BadPaddingException;
@@ -107,6 +109,7 @@ public class Client {
 	
 	private String byteToString(byte[] arg) {
 		return Base64.getEncoder().encodeToString(arg);
+		//return new String(arg);
 	}
 
 	
@@ -115,21 +118,29 @@ public class Client {
 		public void run() {
 			
 			Packet incomingPacket;
+			List<Key> keys = new ArrayList<Key>();
+			keys.add(keypair.getPrivate());
 			
 			while(!terminateFlag) {
 				
-				incomingPacket = multicast.receiveMessage(null);
+				
+				incomingPacket = multicast.receiveMessage(keys);
 				//Valid and clear/decryptable message 
 				if(incomingPacket.isValid()) {
+					//Normal message
 					if(incomingPacket.getType() == 0) {
 						if (incomingPacket.getSenderId() == 0) {
-							System.out.println("Server ##" + ": " + incomingPacket.getMessage());
+							System.out.println("Server: " + incomingPacket.getMessage());
 						} else {
 							System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
-						}
-						
-						
+						}	
 					}
+					//Just joined, first key from server
+					else if(incomingPacket.getType() == 2) {
+						System.out.println("Server approved join request: " + incomingPacket.getMessage());
+					}
+					
+					/*
 					else {
 						if (incomingPacket.getSenderId() == 0) {
 							byte[] dekIncomed;
@@ -140,6 +151,7 @@ public class Client {
 							dek = new SecretKeySpec(dekIncomed, "AES");
 						}
 					}
+					*/
 				}
 				//Cannot decrypt
 				else {
@@ -168,7 +180,7 @@ public class Client {
 	    		}
 	    		else if(msg.equals("JOIN")) {
 	    			System.out.println("Trying to join the group...");
-	    			multicast.sendMessage(1, keypair.getPublic().getEncoded(), null);
+	    			multicast.sendMessage(1, keypair.getPublic().getEncoded(), Settings.SERVER_PUBLIC_KEY);
 	    			System.out.println("###########  "+byteToString(keypair.getPublic().getEncoded()));
 	    		}
 	    		else if(msg.equals("LEAVE")) {
