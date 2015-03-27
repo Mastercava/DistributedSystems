@@ -212,7 +212,7 @@ public class Client {
 	    			System.out.println("###########  "+byteToString(keypair.getPublic().getEncoded()));
 	    		}
 	    		else if(msg.equals("LEAVE")) {
-	    			multicast.sendMessage(3, msg.getBytes(), null);
+	    			multicast.sendMessage(Utilities.LEAVE_MSG, msg.getBytes(), null);
 	    			System.out.println("Trying to leave the group...");
 	    		}
 	    		else {

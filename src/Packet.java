@@ -64,14 +64,14 @@ public class Packet {
 				try {
 					decryptedData = Messaging.decryptAsymmetric(rawData, k);
 				} catch (Exception e) {
-					System.out.println("Message cannot be decrypted by this key " + k.toString());
+					System.out.println("Attempt failed " + k.toString());
 				}
 				
 			} else {
 				try {
 					decryptedData = Messaging.decryptSymmetric(rawData, k);
 				} catch (Exception e) {
-					System.out.println("Message cannot be decrypted by this key " + k.toString());
+					System.out.println("Attempt failed " + k.toString());
 				}
 			}
 			

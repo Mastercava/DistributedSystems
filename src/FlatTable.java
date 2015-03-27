@@ -52,15 +52,27 @@ public class FlatTable {
 	public ArrayList<Key> joinGroup(int clientId) {
 		boolean[] binValues = Utilities.idToBitArray(clientId);
 		ArrayList<Key> keys;
-		
-		keys = changeKeys(binValues);
-			//updates dek
-		
+		//seleziona le keks da inviare al client
+		keys = selectCorrectKeks(binValues);
 			
-		
 		return keys;
 		
 		
+	}
+	
+	private ArrayList<Key> selectCorrectKeks( boolean[] values ) {
+		ArrayList<Key> keys = new ArrayList<Key>();
+		
+		for (int i= 0; i< bitsNeeded; i++) {
+			if (!values[i]) {
+				keys.add(flatTable[0][i]);
+			} else {
+				keys.add(flatTable[1][i]);
+			}
+			
+		}
+		
+		return keys;
 	}
 	
 	public Key changeDek() {
@@ -69,11 +81,11 @@ public class FlatTable {
 		return dek;
 	}
 	
-	public HashMap<Integer[], SecretKey> leaveGroup(int clientId) {
+	public ArrayList<Key> leaveGroup(int clientId) {
 		boolean[] binValues = Utilities.idToBitArray(clientId);
 		
-		HashMap<Integer[], SecretKey> keys;
-		//keys = changeKeys(binValues);
+		SecretKey[][] oldKeys = flatTable;
+		changeKeys(binValues);
 		
 		
 		
@@ -131,6 +143,7 @@ public class FlatTable {
 		SecretKey key = keygen.generateKey();
 		return key;
 	}
+	
 	
 	
 	

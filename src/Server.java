@@ -23,6 +23,7 @@ public class Server {
 	private FlatTable flatTable;
 	private ArrayList<Integer> clientsConnected;
 	private KeyPair keypair;
+	private Key dek;
 	
 	private byte[] encrMessage; //for test
 	
@@ -62,12 +63,12 @@ public class Server {
 			
 			incomingPacket = multicast.receiveMessage(keys);
 			if(incomingPacket.isValid() && incomingPacket.getSenderId() != 0) {
-				if(incomingPacket.getType() == 0) {
-					System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
-				}
-				else {
-					//Client tries to join the group
-					if(incomingPacket.getType() == 1) {
+				switch (incomingPacket.getType()) {
+				
+					case 0:
+						System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
+						break;
+					case 1:
 						byte[] encodedKey = incomingPacket.getData();
 
 											
@@ -78,14 +79,19 @@ public class Server {
 							e.printStackTrace();
 							
 						}
-						
-						
-						//SecretKey clientPublicKey = new SecretKeySpec(encodedKey, 0, encodedKey.length, "RSA");
 						System.out.println("#########  " + byteToString(clientPublicKey.getEncoded()));
 						
 						join(incomingPacket.getSenderId(), clientPublicKey);
+						break;
+					case 4:
+						int senderId = incomingPacket.getSenderId();
+						if (clientsConnected.contains(senderId)) {
+							System.out.println("Client # " + senderId + ": Leave request accepted "  );
+							leave(senderId);
+						}
 						
-					}
+						
+					
 					//Client leaves the group
 					//else if(incomingPacket.getType() == 3) {
 						//leave(incomingPacket.getSenderId());
@@ -142,6 +148,8 @@ public class Server {
 			printConnectedClients();
 			
 			
+		} else {
+			multicast.sendMessage(0, "Host already connected".getBytes() , clientPublicKey);
 		}
 		
 	}
@@ -162,7 +170,8 @@ public class Server {
 		}
 	}
 
-	public void leave(int clientId) {
+	public synchronized void leave(int clientId) {
+		
 		
 		if(clientsConnected.contains(clientId)) {
 			/*
@@ -174,7 +183,16 @@ public class Server {
 			clientsConnected.remove(clientsConnected.indexOf(clientId));
 			String s = "Client #" + clientId + " left the group";
 			System.out.println(s);
-			//multicast.sendMessage(1, flatTable.changeDek().getEncoded(),null);
+			dek = flatTable.changeDek();
+			for (int client : clientsConnected) {
+				boolean[] binId = Utilities.idToBitArray(client);
+				ArrayList<Key> keys = flatTable.getStableKeys(Utilities.getBinaryNeg(binId));
+				for (Key k : keys) {
+					multicast.sendMessage(2, Base64.getEncoder().encode(dek.getEncoded()),k);
+				}
+				
+			}
+			
 			printConnectedClients();
 			
 		}

@@ -3,6 +3,8 @@ import java.util.Base64;
 
 public class Utilities {
 	
+	public static int LEAVE_MSG = 4;
+	
 	
 	public static String keyToString(Key key) {
 		return Base64.getEncoder().encodeToString(key.getEncoded());
@@ -16,6 +18,13 @@ public class Utilities {
 	    }
 	    return bits;
 		    
+	}
+	
+	public static boolean[] getBinaryNeg(boolean[] bitId) {
+		for (int i = 0; i < bitId.length; i++) {
+			bitId[i] = !bitId[i];
+		}
+		return bitId;
 	}
 	
 
