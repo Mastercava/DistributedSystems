@@ -1,0 +1,6 @@
+Type of packets:
+0: messaggi chat
+1: richieste join server
+2: deks
+3: keks
+4: leave
