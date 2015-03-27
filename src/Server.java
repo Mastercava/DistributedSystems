@@ -61,7 +61,7 @@ public class Server {
 		while(true) {
 			
 			incomingPacket = multicast.receiveMessage(keys);
-			if(incomingPacket.isValid()) {
+			if(incomingPacket.isValid() && incomingPacket.getSenderId() != 0) {
 				if(incomingPacket.getType() == 0) {
 					System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
 				}
@@ -87,9 +87,9 @@ public class Server {
 						
 					}
 					//Client leaves the group
-					else if(incomingPacket.getType() == 3) {
-						leave(incomingPacket.getSenderId());
-					}
+					//else if(incomingPacket.getType() == 3) {
+						//leave(incomingPacket.getSenderId());
+					
 				}
 			}	
 		}
@@ -121,13 +121,23 @@ public class Server {
 			//multicast.sendMessage(2, ("ciao").getBytes(), clientPublicKey);
 			
 			//Add the client to the list of clients connected
+			boolean connClients = clientsConnected.isEmpty();
 			clientsConnected.add(clientId);
 			
 			String s = "Client #" + clientId + " joined the group";
 			System.out.println(s);
-			byte[] genKey = flatTable.changeDek().getEncoded();
-			multicast.sendMessage(2, Base64.getEncoder().encode(genKey), clientPublicKey);
-			System.out.println("DEKKKKK     "  + Base64.getEncoder().encodeToString(genKey));
+			Key newDek = flatTable.changeDek();
+			multicast.sendMessage(2, Base64.getEncoder().encode(newDek.getEncoded()), clientPublicKey);
+			System.out.println("DEKKKKK     "  + Base64.getEncoder().encodeToString(newDek.getEncoded()));
+			for (Key k: flatTable.joinGroup(clientId)) {
+				multicast.sendMessage(3, Base64.getEncoder().encode(k.getEncoded()), clientPublicKey);
+				
+			}
+			
+			System.out.println("KEYS SENT");
+			if (!connClients)
+				sendNewDek(clientId,newDek);
+			
 			
 			printConnectedClients();
 			
@@ -136,6 +146,22 @@ public class Server {
 		
 	}
 	
+	private void sendNewDek(int clientId, Key newDek) {
+		boolean[] bitId = Utilities.idToBitArray(clientId); 
+		List<Key> keys;
+		
+		//invert the value of bits of clientId
+		for (int i = 0; i < bitId.length; i++) {
+			bitId[i] = !bitId[i];
+		}
+		
+		keys = flatTable.getStableKeys(bitId);
+		for (Key k : keys) {
+			System.out.println("Trying to send new DEK");
+			multicast.sendMessage(2,  Base64.getEncoder().encode(newDek.getEncoded()),k );
+		}
+	}
+
 	public void leave(int clientId) {
 		
 		if(clientsConnected.contains(clientId)) {

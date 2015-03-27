@@ -1,6 +1,6 @@
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.crypto.KeyGenerator;
@@ -49,10 +49,9 @@ public class FlatTable {
 		
 	}
 	
-	public HashMap<Integer[], SecretKey> joinGroup(int clientId) {
+	public ArrayList<Key> joinGroup(int clientId) {
 		boolean[] binValues = Utilities.idToBitArray(clientId);
-		HashMap<Integer[],SecretKey> keys;
-		Integer[] keyId = new Integer[2];
+		ArrayList<Key> keys;
 		
 		keys = changeKeys(binValues);
 			//updates dek
@@ -74,23 +73,25 @@ public class FlatTable {
 		boolean[] binValues = Utilities.idToBitArray(clientId);
 		
 		HashMap<Integer[], SecretKey> keys;
-		keys = changeKeys(binValues);
+		//keys = changeKeys(binValues);
 		
 		
 		
-		return keys;
+		return null;
 	}
 	
-	private HashMap<Integer[], SecretKey> changeKeys(boolean[] value) {
+	private ArrayList<Key> changeKeys(boolean[] value) {
 		Integer[] keyId = new Integer[2]; 
 		HashMap<Integer[],SecretKey> keyGenerated;
 		keyGenerated = new HashMap<Integer[],SecretKey>();
+		ArrayList<Key >keysGenerated = new ArrayList<Key>(); 
 		for (int i = 0; i < bitsNeeded; i++) {
 			if (!value[i]) {
 				flatTable[0][i] = keygen.generateKey();
 				keyId[0] = i;
 				keyId[1] = 0;
 				keyGenerated.put(keyId, flatTable[0][i]);
+				keysGenerated.add(flatTable[0][i]);
 				System.out.println("Key " + i + "," + 1 +" updated!");
 
 			} else {
@@ -98,14 +99,30 @@ public class FlatTable {
 				keyId[0] = i;
 				keyId[1] = 1;
 				keyGenerated.put(keyId, flatTable[1][i]);
+				keysGenerated.add(flatTable[1][i]);
 				System.out.println("Key " + i + "," + 1 +" updated!");
 				
 			}
 		}
 		
-		return keyGenerated;
+		return keysGenerated;
 		
 		
+	}
+	
+	public ArrayList<Key> getStableKeys(boolean[] value) {
+		ArrayList<Key> toReturn = new ArrayList<Key>();
+		for (int i= 0; i<bitsNeeded; i++) {
+			if (!value[i]) {
+				toReturn.add(flatTable[0][i]);
+			} else {
+				toReturn.add(flatTable[1][i]);
+			}
+		}
+		
+		System.out.println("STABLE KEYS DIMENSION   "  + toReturn.size());
+		
+		return toReturn;
 	}
 	
 	

@@ -35,6 +35,8 @@ public class Client {
 	
 	private SecretKey dek;
 	
+	private List<Key> keks;
+	
 	public static void main(String[] args) {
 		
 		//Selects the id for the client 
@@ -63,6 +65,8 @@ public class Client {
 
 		SendThread snd = new SendThread();
 		snd.start();
+		
+		keks = new ArrayList<Key>();
 		
 		/*
 		
@@ -121,6 +125,7 @@ public class Client {
 			
 			Packet incomingPacket;
 			List<Key> keys = new ArrayList<Key>();
+			
 			keys.add(keypair.getPrivate());
 			
 			while(!terminateFlag) {
@@ -130,21 +135,38 @@ public class Client {
 				//Valid and clear/decryptable message 
 				if(incomingPacket.isValid()) {
 					//Normal message
-					if(incomingPacket.getType() == 0) {
-						if (incomingPacket.getSenderId() == 0) {
-							System.out.println("Server: " + incomingPacket.getMessage());
-						} else {
-							System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
-						}	
-					}
-					//Just joined, first key from server
-					else if(incomingPacket.getType() == 2) {
-						System.out.println("Server approved join request: " );
-						byte[] incMsg = Base64.getDecoder().decode(incomingPacket.getMessage());
-						dek = new SecretKeySpec(incMsg, 0, incMsg.length, Settings.ENCRYPTION_ALGORITHM);
-						keys.add(dek);
-						System.out.println("   " + byteToString(dek.getEncoded()));
-					}
+					switch (incomingPacket.getType()) {
+						case 0:
+							if (incomingPacket.getSenderId() == 0) {
+								System.out.println("Server: " + incomingPacket.getMessage());
+							} else {
+								System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
+							}	
+							break;
+					//DEK 
+						case 2:
+							
+						
+							byte[] incMsg = Base64.getDecoder().decode(incomingPacket.getMessage());
+							SecretKey incKey = new SecretKeySpec(incMsg, 0, incMsg.length, Settings.ENCRYPTION_ALGORITHM);
+							keys.remove(dek);
+							keys.add(incKey);
+							
+						
+							dek = incKey;
+							System.out.println("DEK RECEIVED");
+							break;
+						 
+						case 3:
+							incMsg = Base64.getDecoder().decode(incomingPacket.getMessage());
+							incKey = new SecretKeySpec(incMsg, 0, incMsg.length, Settings.ENCRYPTION_ALGORITHM);
+							keys.add(incKey);
+							keks.add(incKey);
+							System.out.println("KEK RECEIVED  ");
+							break;
+					}		
+							
+							
 					
 					/*
 					else {
