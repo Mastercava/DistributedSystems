@@ -4,6 +4,7 @@ import java.util.Base64;
 public class Utilities {
 	
 	public static int LEAVE_MSG = 4;
+	public static int NEW_KEK_MSG = 5;
 	
 	
 	public static String keyToString(Key key) {

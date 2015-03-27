@@ -92,9 +92,6 @@ public class Server {
 						
 						
 					
-					//Client leaves the group
-					//else if(incomingPacket.getType() == 3) {
-						//leave(incomingPacket.getSenderId());
 					
 				}
 			}	
@@ -105,26 +102,6 @@ public class Server {
 	public synchronized void join(int clientId, Key clientPublicKey) {
 		
 		if(!clientsConnected.contains(clientId)) {
-			/*
-			
-			msg.sendMessage(0, str.getBytes());
-			HashMap<Integer[], SecretKey> newKeys;
-			newKeys = flatTable.joinGroup(clientId);
-			
-	
-			//add method to send values to hashmap
-			byte[] encryptedMsg = null;
-	
-			
-			
-			Key newDek = flatTable.changeDek();
-			newDek = flatTable.changeDek();
-			
-			initialSendDek(key, Utilities.keyToString(newDek).getBytes());
-			
-			*/
-		
-			//multicast.sendMessage(2, ("ciao").getBytes(), clientPublicKey);
 			
 			//Add the client to the list of clients connected
 			boolean connClients = clientsConnected.isEmpty();
@@ -184,6 +161,7 @@ public class Server {
 			String s = "Client #" + clientId + " left the group";
 			System.out.println(s);
 			dek = flatTable.changeDek();
+			//message for new dek
 			for (int client : clientsConnected) {
 				boolean[] binId = Utilities.idToBitArray(client);
 				ArrayList<Key> keys = flatTable.getStableKeys(Utilities.getBinaryNeg(binId));
@@ -193,42 +171,31 @@ public class Server {
 				
 			}
 			
+			//generate new keks
+			Key[][] oldKeks = flatTable.getTable();
+			flatTable.changeKeys(Utilities.idToBitArray(clientId));
+			Key[][] newKeks= flatTable.getTable(); 
+			byte[] newMessage;
+			
+			for (int i = 0; i < 2; i++) {
+				for (int j = 0; j < flatTable.getBitsNeeded(); j++) {
+					if (!oldKeks[i][j].equals(newKeks[i][j])) {
+						byte[] keyToSend = newKeks[i][j].getEncoded();
+						newMessage = Messaging.encryptSymmetric(Base64.getEncoder().encode(keyToSend), oldKeks[i][j]);
+						multicast.sendMessage(Utilities.NEW_KEK_MSG, newMessage, dek);
+					}
+				}
+			}
+			
+			
+			
+			
 			printConnectedClients();
 			
 		}
 		
 	}
 
-	
-	/*
-	private void initialSendDek(Key key, byte[] message) {
-		
-		/*
-		try {
-			//encryptedMsg = asymmetricEncrypt(newKeys.toString().getBytes(), key);
-			encrMessage = encryptAsymmetric(Base64.getEncoder().encode(message), key);
-		} catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		Messaging msg = new Messaging(serverId);
-		
-		//marco controlla qua la send se i parametri sono ok
-		msg.sendMessage(1, encrMessage, null);
-<<<<<<< HEAD
-=======
-		*/
-		
-
-	
-	
 	
 	private void printConnectedClients() {
 		String msg;

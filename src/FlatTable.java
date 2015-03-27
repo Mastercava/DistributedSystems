@@ -81,18 +81,9 @@ public class FlatTable {
 		return dek;
 	}
 	
-	public ArrayList<Key> leaveGroup(int clientId) {
-		boolean[] binValues = Utilities.idToBitArray(clientId);
-		
-		SecretKey[][] oldKeys = flatTable;
-		changeKeys(binValues);
-		
-		
-		
-		return null;
-	}
 	
-	private ArrayList<Key> changeKeys(boolean[] value) {
+	
+	public void changeKeys(boolean[] value) {
 		Integer[] keyId = new Integer[2]; 
 		HashMap<Integer[],SecretKey> keyGenerated;
 		keyGenerated = new HashMap<Integer[],SecretKey>();
@@ -117,7 +108,7 @@ public class FlatTable {
 			}
 		}
 		
-		return keysGenerated;
+		
 		
 		
 	}
@@ -139,9 +130,20 @@ public class FlatTable {
 	
 	
 	
+	
+	
 	private SecretKey generateKey() {
 		SecretKey key = keygen.generateKey();
 		return key;
+	}
+	
+	public Key[][] getTable() {
+		return flatTable;
+	}
+
+	public int getBitsNeeded() {
+		
+		return bitsNeeded;
 	}
 	
 	

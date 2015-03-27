@@ -82,7 +82,7 @@ public class Messaging {
 		return true;
 	}
 	
-	private byte[] encryptSymmetric(byte[] data, Key key) {
+	public static byte[] encryptSymmetric(byte[] data, Key key) {
 		System.out.println("ORIGINAL DATA LENGHT: " + data.length);
 		
 		byte[] encryptedData = null;

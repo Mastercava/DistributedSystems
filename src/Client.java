@@ -164,7 +164,17 @@ public class Client {
 							keks.add(incKey);
 							System.out.println("KEK RECEIVED  ");
 							break;
+						
+						case 5:
+							incMsg = Base64.getDecoder().decode(incomingPacket.getMessage());
+							for (Key k : keys) {
+								
+							}
+							break;
+							
+						
 					}		
+					
 							
 							
 					
