@@ -10,6 +10,7 @@ import java.security.SecureRandom;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -31,7 +32,7 @@ public class Client {
 	
 	private int clientId;
 	
-	private boolean terminateFlag = false;
+	private static boolean terminateFlag;
 	
 	private SecretKey dek;
 	
@@ -42,15 +43,37 @@ public class Client {
 		//Selects the id for the client 
 		System.out.print("Insert an ID for this client: ");
 		Scanner reader = new Scanner(System.in);
-		int assignedId = reader.nextInt();
+		int readedInt = -1;
+		int assignedId = -1;
 		
+		try {
+			readedInt = reader.nextInt();
+		} catch (InputMismatchException e) {
+			
+		}
+		
+		while (readedInt > Settings.MAX_USERS && readedInt <= 0) {
+			System.out.println("Id not correct, insert another one");
+			try {
+				readedInt = reader.nextInt();
+			} catch (InputMismatchException e) {
+				
+			}
+		}
+		
+		assignedId = readedInt;
 		//Creates a client instance
 		Client client = new Client(assignedId);
+		
+			
 		
 		
 	}
 	
 	
+	
+
+
 	public Client(int assignedId) {
 
 		clientId = assignedId;
@@ -215,6 +238,7 @@ public class Client {
 	    		if(msg.equals("EXIT")) {
 	    			terminateFlag = true;
 	    			System.out.println("Closing client process");
+	    			System.exit(0);
 	    		}
 	    		else if(msg.equals("JOIN")) {
 	    			System.out.println("Trying to join the group...");
