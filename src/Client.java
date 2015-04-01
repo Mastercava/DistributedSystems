@@ -166,10 +166,9 @@ public class Client {
 							break;
 						
 						case 5:
+							System.out.println("KEK UPDATE MESSAGE RECEIVED");
 							incMsg = Base64.getDecoder().decode(incomingPacket.getMessage());
-							for (Key k : keys) {
-								
-							}
+							decryptKekUpdateMessage(keys,incMsg);
 							break;
 							
 						
@@ -215,6 +214,7 @@ public class Client {
 	    		if(msg.equals("EXIT")) {
 	    			terminateFlag = true;
 	    			System.out.println("Closing client process");
+	    			return;
 	    		}
 	    		else if(msg.equals("JOIN")) {
 	    			System.out.println("Trying to join the group...");
@@ -234,6 +234,27 @@ public class Client {
 			}
 
 		}
+	}
+
+
+	private void decryptKekUpdateMessage(List<Key> keys, byte[] incMsg) {
+		byte [] decryptedMessage;
+		for (Key k : keys) {
+			try {
+				decryptedMessage = Messaging.decryptSymmetric(incMsg, k);
+				if (decryptedMessage[0] == Settings.CHECK_CODE) {
+					System.out.println("NEW KEK DECRYPTED");
+					keks.remove(k);
+					SecretKey newKek = new SecretKeySpec(incMsg, 1, incMsg.length, Settings.ENCRYPTION_ALGORITHM);
+					keks.add(newKek);
+					break;
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		System.out.println("KEK UPDATED");
 	}	
 
 	
