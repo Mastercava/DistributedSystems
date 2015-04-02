@@ -65,10 +65,11 @@ public class Server {
 			if(incomingPacket.isValid() && incomingPacket.getSenderId() != serverId) {
 				switch (incomingPacket.getType()) {
 				
-					case 0:
+					case 0:	//Normal message
 						System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
 						break;
-					case 1:
+						
+					case 1: //Join request from client
 						byte[] encodedKey = incomingPacket.getData();
 
 											
@@ -79,11 +80,11 @@ public class Server {
 							e.printStackTrace();
 							
 						}
-						System.out.println("#########  " + byteToString(clientPublicKey.getEncoded()));
-						
+						//System.out.println("#########  " + byteToString(clientPublicKey.getEncoded()));
 						join(incomingPacket.getSenderId(), clientPublicKey);
 						break;
-					case 4:
+						
+					case 4: //Leave request from client
 						int senderId = incomingPacket.getSenderId();
 						if (clientsConnected.contains(senderId)) {
 							System.out.println("Client # " + senderId + ": Leave request accepted "  );

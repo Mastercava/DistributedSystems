@@ -157,19 +157,19 @@ public class Client {
 				incomingPacket = multicast.receiveMessage(keys);
 				//Valid and clear/decryptable message 
 				if(incomingPacket.isValid()) {
-					//Normal message
+		
 					switch (incomingPacket.getType()) {
-						case 0:
+						
+						case 0: //Normal message
 							if (incomingPacket.getSenderId() == Settings.SERVER_ID) {
 								System.out.println("Server: " + incomingPacket.getMessage());
 							} else {
 								System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
 							}	
 							break;
-					//DEK 
-						case 2:
+					
+						case 2: //DEK received
 							
-						
 							byte[] incMsg = Base64.getDecoder().decode(incomingPacket.getMessage());
 							SecretKey incKey = new SecretKeySpec(incMsg, 0, incMsg.length, Settings.ENCRYPTION_ALGORITHM);
 							keys.remove(dek);
@@ -180,7 +180,7 @@ public class Client {
 							System.out.println("DEK RECEIVED");
 							break;
 						 
-						case 3:
+						case 3: //KEK received
 							incMsg = Base64.getDecoder().decode(incomingPacket.getMessage());
 							incKey = new SecretKeySpec(incMsg, 0, incMsg.length, Settings.ENCRYPTION_ALGORITHM);
 							keys.add(incKey);
@@ -243,7 +243,7 @@ public class Client {
 	    		else if(msg.equals("JOIN")) {
 	    			System.out.println("Trying to join the group...");
 	    			multicast.sendMessage(1, keypair.getPublic().getEncoded(), Settings.SERVER_PUBLIC_KEY);
-	    			System.out.println("###########  "+byteToString(keypair.getPublic().getEncoded()));
+	    			//System.out.println("###########  "+byteToString(keypair.getPublic().getEncoded()));
 	    		}
 	    		else if(msg.equals("LEAVE")) {
 	    			multicast.sendMessage(Utilities.LEAVE_MSG, msg.getBytes(), null);
@@ -252,6 +252,9 @@ public class Client {
 	    		else {
 	    			if (dek != null) {
 	    				multicast.sendMessage(0, msg.getBytes(), dek);
+	    			}
+	    			else {
+	    				multicast.sendMessage(0, msg.getBytes(), null);
 	    			}
 	    			
 	    		}
