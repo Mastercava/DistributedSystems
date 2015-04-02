@@ -13,10 +13,21 @@ public class Utilities {
 	
 	public static boolean[] idToBitArray(int clientId) {
 			
-		boolean[] bits = new boolean[7];
-	    for (int i = 6; i >= 0; i--) {
+		boolean[] bits = new boolean[Settings.BIT_NUMBER];
+	    for (int i = Settings.BIT_NUMBER - 1; i >= 0; i--) {
 	        bits[i] = (clientId & (1 << i)) != 0;
 	    }
+	    System.out.println("NEW BIT ARRAY");
+	    for (int i = Settings.BIT_NUMBER - 1; i >= 0; i--) {
+	    	if (bits[i]) {
+	    		System.out.print("1");
+	    	} else {
+	    		System.out.print("0");
+	    	}
+	    	
+	    }
+	    System.out.print("\n");
+	    
 	    return bits;
 		    
 	}
@@ -25,6 +36,15 @@ public class Utilities {
 		for (int i = 0; i < bitId.length; i++) {
 			bitId[i] = !bitId[i];
 		}
+		 for (int i = Settings.BIT_NUMBER - 1; i >= 0; i--) {
+		    	if (bitId[i]) {
+		    		System.out.print("1");
+		    	} else {
+		    		System.out.print("0");
+		    	}
+		    	
+		    }
+		    System.out.print("\n");
 		return bitId;
 	}
 	

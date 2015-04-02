@@ -160,7 +160,7 @@ public class Client {
 					//Normal message
 					switch (incomingPacket.getType()) {
 						case 0:
-							if (incomingPacket.getSenderId() == 0) {
+							if (incomingPacket.getSenderId() == Settings.SERVER_ID) {
 								System.out.println("Server: " + incomingPacket.getMessage());
 							} else {
 								System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());

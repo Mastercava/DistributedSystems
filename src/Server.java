@@ -17,7 +17,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class Server {
 	
-	private final int serverId = 0; 
+	private final int serverId = -1; 
 	
 	private Messaging multicast;
 	private FlatTable flatTable;
@@ -62,7 +62,7 @@ public class Server {
 		while(true) {
 			
 			incomingPacket = multicast.receiveMessage(keys);
-			if(incomingPacket.isValid() && incomingPacket.getSenderId() != 0) {
+			if(incomingPacket.isValid() && incomingPacket.getSenderId() != serverId) {
 				switch (incomingPacket.getType()) {
 				
 					case 0:
@@ -163,7 +163,7 @@ public class Server {
 			dek = flatTable.changeDek();
 			//message for new dek
 			for (int client : clientsConnected) {
-				boolean[] binId = Utilities.idToBitArray(client);
+				boolean[] binId = Utilities.idToBitArray(clientId);
 				ArrayList<Key> keys = flatTable.getStableKeys(Utilities.getBinaryNeg(binId));
 				for (Key k : keys) {
 					multicast.sendMessage(2, Base64.getEncoder().encode(dek.getEncoded()),k);

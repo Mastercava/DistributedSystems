@@ -95,7 +95,7 @@ public class FlatTable {
 				keyId[1] = 0;
 				keyGenerated.put(keyId, flatTable[0][i]);
 				keysGenerated.add(flatTable[0][i]);
-				System.out.println("Key " + i + "," + 1 +" updated!");
+				System.out.println("Key " + i + "," + 0 +" updated!");
 
 			} else {
 				flatTable[0][i] = keygen.generateKey();
