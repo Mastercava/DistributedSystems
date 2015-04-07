@@ -192,8 +192,8 @@ public class Server {
 						newMessage = new byte[newKeks[i][j].getEncoded().length + 1];
 						byte[] keyToSend = newKeks[i][j].getEncoded();
 						newMessage[0] = Settings.CHECK_CODE;
-						newMessage = Arrays.copyOfRange(keyToSend,1,keyToSend.length+1);
-						newMessage = Messaging.encryptSymmetric(newMessage, oldKeks[i][j]);
+						System.arraycopy(keyToSend, 0, newMessage, 1, keyToSend.length);
+						newMessage = Messaging.encryptSymmetric(Base64.getEncoder().encode(newMessage), oldKeks[i][j]);
 						multicast.sendMessage(Utilities.NEW_KEK_MSG, Base64.getEncoder().encode(newMessage), dek);
 					} else {
 						System.out.println("KEY " + i + "," + j + "not sent");

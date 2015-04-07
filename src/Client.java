@@ -193,17 +193,19 @@ public class Client {
 						case 5:
 							incMsg = Base64.getDecoder().decode(incomingPacket.getMessage());
 							Key newKek;
-							for (Key k : keys) {
+							Key kekToRemove = null;
+							cycle: for (Key k : keys) {
 								try {
 									incMsg = Messaging.decryptSymmetric(incMsg,k);
 									System.out.println("KEK RECEIVED");
+									incMsg = Base64.getDecoder().decode(incMsg);
 									if (incMsg[0] == Settings.CHECK_CODE) {
-										System.out.println("ENCRYPTION OK");
-										keys.remove(k);
-										newKek = new SecretKeySpec(incMsg, 1, incMsg.length + 1, "AES");
+										System.out.println("DECRYPTION OK");
+										newKek = new SecretKeySpec(incMsg, 1, incMsg.length -1, "AES");
+										kekToRemove = k;
 										keys.add(newKek);
 										System.out.println("NEW KEK UPDATED");
-										break;
+										break cycle;
 									} else {
 										System.out.println("SOMETHING WENT WRONG");
 									}
@@ -213,6 +215,8 @@ public class Client {
 								}
 								
 							}
+							keys.remove(kekToRemove);
+							System.out.println("OLD KEK REPLACED");
 							break;
 							
 						
