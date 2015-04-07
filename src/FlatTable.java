@@ -83,7 +83,7 @@ public class FlatTable {
 	
 	
 	
-	public void changeKeys(boolean[] value) {
+	public boolean changeKeys(boolean[] value) {
 		Integer[] keyId = new Integer[2]; 
 		HashMap<Integer[],SecretKey> keyGenerated;
 		keyGenerated = new HashMap<Integer[],SecretKey>();
@@ -107,6 +107,8 @@ public class FlatTable {
 				
 			}
 		}
+		
+		return true;
 		
 		
 		
@@ -137,7 +139,18 @@ public class FlatTable {
 		return key;
 	}
 	
-	public Key[][] getTable() {
+	public Key[][] getOldTable() {
+		Key[][] table = new Key[2][Settings.BIT_NUMBER];
+		
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < Settings.BIT_NUMBER; j++) {
+				table[i][j] = flatTable[i][j];
+			}
+		}
+		return table;
+	}
+	
+	public Key[][] getNewTable() {
 		return flatTable;
 	}
 

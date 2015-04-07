@@ -105,7 +105,7 @@ public class Client {
 	}
 	
 	
-	private void decryptMessageAsymmetric(byte[] message) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+	private byte[] decryptMessageAsymmetric(byte[] message) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 		byte[] msg;
 		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.DECRYPT_MODE, keypair.getPrivate());
@@ -113,6 +113,8 @@ public class Client {
 		msg = cipher.doFinal(message);
 		
 		System.out.println("PLAIN MSG " + byteToString(msg));
+		
+		return msg;
 		
 	}
 	
@@ -190,7 +192,25 @@ public class Client {
 						
 						case 5:
 							incMsg = Base64.getDecoder().decode(incomingPacket.getMessage());
+							Key newKek;
 							for (Key k : keys) {
+								try {
+									incMsg = Messaging.decryptSymmetric(incMsg,k);
+									System.out.println("KEK RECEIVED");
+									if (incMsg[0] == Settings.CHECK_CODE) {
+										System.out.println("ENCRYPTION OK");
+										keys.remove(k);
+										newKek = new SecretKeySpec(incMsg, 1, incMsg.length + 1, "AES");
+										keys.add(newKek);
+										System.out.println("NEW KEK UPDATED");
+										break;
+									} else {
+										System.out.println("SOMETHING WENT WRONG");
+									}
+								} catch ( Exception e) {
+									// TODO Auto-generated catch block
+									System.out.println("Unable to Decrypt");
+								}
 								
 							}
 							break;

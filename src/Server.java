@@ -7,6 +7,7 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
@@ -173,18 +174,31 @@ public class Server {
 			}
 			
 			//generate new keks
-			Key[][] oldKeks = flatTable.getTable();
+			Key[][] oldKeks = flatTable.getOldTable();
+			
 			flatTable.changeKeys(Utilities.idToBitArray(clientId));
-			Key[][] newKeks= flatTable.getTable(); 
+			Key[][] newKeks= flatTable.getNewTable(); 
 			byte[] newMessage;
 			
 			for (int i = 0; i < 2; i++) {
 				for (int j = 0; j < flatTable.getBitsNeeded(); j++) {
-					if (!oldKeks[i][j].equals(newKeks[i][j])) {
+					String oldKey = Base64.getEncoder().encodeToString(oldKeks[i][j].getEncoded());
+					System.out.println("OLD KEY " + oldKey );
+					
+					String newKey = Base64.getEncoder().encodeToString(newKeks[i][j].getEncoded());
+					System.out.println("NEW KEY " + newKey ); 
+					
+					if (!oldKey.equals(newKey)) {
+						newMessage = new byte[newKeks[i][j].getEncoded().length + 1];
 						byte[] keyToSend = newKeks[i][j].getEncoded();
-						newMessage = Messaging.encryptSymmetric(Base64.getEncoder().encode(keyToSend), oldKeks[i][j]);
-						multicast.sendMessage(Utilities.NEW_KEK_MSG, newMessage, dek);
+						newMessage[0] = Settings.CHECK_CODE;
+						newMessage = Arrays.copyOfRange(keyToSend,1,keyToSend.length+1);
+						newMessage = Messaging.encryptSymmetric(newMessage, oldKeks[i][j]);
+						multicast.sendMessage(Utilities.NEW_KEK_MSG, Base64.getEncoder().encode(newMessage), dek);
+					} else {
+						System.out.println("KEY " + i + "," + j + "not sent");
 					}
+					
 				}
 			}
 			
