@@ -11,30 +11,5 @@ public class Settings {
 	public static int MAX_USERS = 8;
 	public static int SERVER_ID = -1;
 	public static int BIT_NUMBER = 3;
-
-	/*
-	private Settings() {
-		
-	}
-	
-	public static Settings getInstance() {
-		if(instance == null) instance = new Settings();
-		return instance;
-	}
-	*/
-	
-	public static void setServerPublicKey(Key key) {
-		SERVER_PUBLIC_KEY = key;
-	}
-	
-	public static boolean asymmetric() {
-		return false;
-	}
-	
-	public static boolean symmetric() {
-		return true;
-	}
-	
-	
 	
 }
