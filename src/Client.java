@@ -240,7 +240,7 @@ public class Client {
 				}
 				//Cannot decrypt
 				else {
-					System.out.println("Unable to decrypt: " + incomingPacket.getMessage());
+					//System.out.println("Unable to decrypt: " + incomingPacket.getMessage());
 				}
 				
 			}
@@ -272,6 +272,8 @@ public class Client {
 	    		else if(msg.equals("LEAVE")) {
 	    			multicast.sendMessage(Utilities.LEAVE_MSG, msg.getBytes(), null);
 	    			System.out.println("Trying to leave the group...");
+	    			dek = null;
+	    			keks = new ArrayList<Key>();
 	    		}
 	    		else {
 	    			if (dek != null) {

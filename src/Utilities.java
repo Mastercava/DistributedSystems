@@ -48,5 +48,8 @@ public class Utilities {
 		return bitId;
 	}
 	
+	public static void logMessage(String msg) {
+		System.out.println((char) 27 + "[36m" + msg);
+	}
 
 }

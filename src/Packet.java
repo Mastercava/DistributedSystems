@@ -55,7 +55,7 @@ public class Packet {
 
 	public void tryDecryption(List<Key> keys) {
 		if(isValid() || keys == null) return;
-		System.out.println("TRYING TO DECRYPT MESSAGE OF LENGHT " + rawData.length + "...");
+		//System.out.println("TRYING TO DECRYPT MESSAGE OF LENGHT " + rawData.length + "...");
 		
 		for(Key k : keys) {
 			
@@ -64,14 +64,14 @@ public class Packet {
 				try {
 					decryptedData = Messaging.decryptAsymmetric(rawData, k);
 				} catch (Exception e) {
-					System.out.println("Attempt failed " + k.toString());
+					//System.out.println("Attempt failed " + k.toString());
 				}
 				
 			} else {
 				try {
 					decryptedData = Messaging.decryptSymmetric(rawData, k);
 				} catch (Exception e) {
-					System.out.println("Attempt failed " + k.toString());
+					//System.out.println("Attempt failed " + k.toString());
 				}
 			}
 			

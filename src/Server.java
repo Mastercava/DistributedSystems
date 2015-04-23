@@ -67,7 +67,7 @@ public class Server {
 				switch (incomingPacket.getType()) {
 				
 					case 0:	//Normal message
-						System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
+						//System.out.println("Client #" + incomingPacket.getSenderId() + ": " + incomingPacket.getMessage());
 						break;
 						
 					case 1: //Join request from client
