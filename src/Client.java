@@ -28,6 +28,7 @@ public class Client {
 	
 	private Messaging multicast;
 	
+	private byte[] messageReceived;
 	
 	private int clientId;
 	
@@ -63,7 +64,6 @@ public class Client {
 		assignedId = readedInt;
 		//Creates a client instance
 		Client client = new Client(assignedId);
-		reader.close();
 		
 			
 		
@@ -105,7 +105,18 @@ public class Client {
 	}
 	
 	
-	
+	private byte[] decryptMessageAsymmetric(byte[] message) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+		byte[] msg;
+		Cipher cipher = Cipher.getInstance("RSA");
+		cipher.init(Cipher.DECRYPT_MODE, keypair.getPrivate());
+		
+		msg = cipher.doFinal(message);
+		
+		System.out.println("PLAIN MSG " + byteToString(msg));
+		
+		return msg;
+		
+	}
 	
 	
 	private boolean generateKeys() {

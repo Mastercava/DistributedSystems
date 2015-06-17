@@ -2,12 +2,17 @@ import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 
 
@@ -159,14 +164,15 @@ public class Server {
 			System.out.println(s);
 			dek = flatTable.changeDek();
 			//message for new dek
-
-			boolean[] binId = Utilities.idToBitArray(clientId);
-			ArrayList<Key> keys = flatTable.getStableKeys(Utilities.getBinaryNeg(binId));
-			for (Key k : keys) {
-				multicast.sendMessage(2, Base64.getEncoder().encode(dek.getEncoded()),k);
+			for (int client : clientsConnected) {
+				boolean[] binId = Utilities.idToBitArray(clientId);
+				ArrayList<Key> keys = flatTable.getStableKeys(Utilities.getBinaryNeg(binId));
+				for (Key k : keys) {
+					multicast.sendMessage(2, Base64.getEncoder().encode(dek.getEncoded()),k);
+				}
+				
 			}
-
-						
+			
 			//generate new keks
 			Key[][] oldKeks = flatTable.getOldTable();
 			
@@ -235,5 +241,9 @@ public class Server {
 		return true;
 	}
 	
+	private String byteToString(byte[] arg) {
+		return Base64.getEncoder().encodeToString(arg);
+		//return new String(arg);
+	}
 	
 }
