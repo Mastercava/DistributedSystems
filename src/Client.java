@@ -240,7 +240,7 @@ public class Client {
 				}
 				//Cannot decrypt
 				else {
-					//System.out.println("Unable to decrypt: " + incomingPacket.getMessage());
+					System.out.println("Unable to decrypt: " + incomingPacket.getMessage());
 				}
 				
 			}
